@@ -1,0 +1,25 @@
+# ESP32 REST API QEMU Project - Default Configuration
+# These settings enable OpenCores Ethernet networking and HTTP client for QEMU
+
+# --- Ethernet (OpenCores MAC for QEMU) ---
+CONFIG_ETH_USE_OPENETH=y
+
+# --- LWIP (TCP/IP stack) ---
+CONFIG_LWIP_DHCP_DOES_ARP_CHECK=n
+
+# --- HTTP Client ---
+CONFIG_ESP_HTTP_CLIENT_ENABLE_HTTPS=n
+
+# --- Disable hardware crypto (not emulated by QEMU) ---
+CONFIG_MBEDTLS_HARDWARE_AES=n
+CONFIG_MBEDTLS_HARDWARE_SHA=n
+CONFIG_MBEDTLS_HARDWARE_MPI=n
+
+# --- Flash size (match QEMU 4MB) ---
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+
+# --- Partition table ---
+CONFIG_PARTITION_TABLE_SINGLE_APP=y
+
+# --- Log level (show INFO for demo visibility) ---
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y

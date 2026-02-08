@@ -1,0 +1,22 @@
+# ESP32 MQTT QEMU Project - Default Configuration
+# Enables OpenCores Ethernet and MQTT for QEMU
+
+# --- Ethernet (OpenCores MAC for QEMU) ---
+CONFIG_ETH_USE_OPENETH=y
+
+# --- LWIP (TCP/IP stack) ---
+CONFIG_LWIP_DHCP_DOES_ARP_CHECK=n
+
+# --- Disable hardware crypto (not emulated by QEMU) ---
+CONFIG_MBEDTLS_HARDWARE_AES=n
+CONFIG_MBEDTLS_HARDWARE_SHA=n
+CONFIG_MBEDTLS_HARDWARE_MPI=n
+
+# --- Flash size (match QEMU 4MB) ---
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+
+# --- Partition table ---
+CONFIG_PARTITION_TABLE_SINGLE_APP=y
+
+# --- Log level (show INFO for demo visibility) ---
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y

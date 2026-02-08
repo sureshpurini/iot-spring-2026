@@ -1,0 +1,3308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Development Guide - IoT Course Spring 2026</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        /* Tab Navigation - Left Sidebar */
+        .tab-nav {
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            min-width: 200px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .tab-btn {
+            padding: 15px 20px;
+            border: none;
+            background: #e8eaf6;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            color: #3949ab;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            text-align: left;
+        }
+
+        .tab-btn:hover {
+            background: #c5cae9;
+        }
+
+        .tab-btn.active {
+            background: white;
+            border-left: 4px solid #3949ab;
+            color: #1a237e;
+        }
+
+        /* Tab Content */
+        .tab-content-wrapper {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            color: #1a237e;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8eaf6;
+        }
+
+        h3 {
+            color: #3949ab;
+            margin: 25px 0 15px 0;
+        }
+
+        h4 {
+            color: #5c6bc0;
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: #263238;
+            color: #aed581;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        pre code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #e8eaf6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Copy Button */
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #546e7a;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .copy-btn:hover {
+            background: #78909c;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e8eaf6;
+        }
+
+        th {
+            background: #3949ab;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 15px 0 15px 25px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #3949ab;
+        }
+
+        .card h4 {
+            margin-top: 0;
+            color: #1a237e;
+        }
+
+        .card.success {
+            border-left-color: #4caf50;
+            background: #e8f5e9;
+        }
+
+        .card.warning {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+        }
+
+        .card.danger {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+
+        .card.info {
+            border-left-color: #2196f3;
+            background: #e3f2fd;
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            color: #1565c0;
+        }
+
+        .alert-warning {
+            background: #fff3e0;
+            border: 1px solid #ff9800;
+            color: #e65100;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
+        }
+
+        /* Keyboard shortcuts */
+        kbd {
+            background: #263238;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            box-shadow: 0 2px 0 #37474f;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            margin-top: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .tab-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+                position: static;
+                min-width: auto;
+            }
+
+            .tab-btn {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+            }
+
+            .tab-btn.active {
+                border-left: none;
+                border-bottom: 3px solid #3949ab;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>ESP32 Development Guide</h1>
+    <p>IoT Course - Spring 2026 | Arduino IDE vs ESP-IDF + QEMU Emulation</p>
+</header>
+
+<div class="container">
+    <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="overview">Overview</button>
+        <button class="tab-btn" data-tab="arduino">Arduino IDE</button>
+        <button class="tab-btn" data-tab="espidf">ESP-IDF</button>
+        <button class="tab-btn" data-tab="comparison">Comparison</button>
+        <button class="tab-btn" data-tab="docker">Docker Setup</button>
+        <button class="tab-btn" data-tab="qemu">QEMU Usage</button>
+        <button class="tab-btn" data-tab="programs">Code Explained</button>
+        <button class="tab-btn" data-tab="tutorial">ESP-IDF Tutorial</button>
+        <button class="tab-btn" data-tab="networking">Networking</button>
+        <button class="tab-btn" data-tab="casestudies">Case Studies</button>
+        <button class="tab-btn" data-tab="commands">Quick Reference</button>
+        <button class="tab-btn" data-tab="references">References</button>
+    </nav>
+
+    <div class="tab-content-wrapper">
+    <!-- Overview Tab -->
+    <div id="overview" class="tab-content active">
+        <h2>ESP32 Overview</h2>
+
+        <h3>What is ESP32?</h3>
+        <p>The ESP32 is a low-cost, low-power microcontroller with integrated WiFi and Bluetooth, made by Espressif Systems. It's widely used in IoT applications.</p>
+
+        <div class="card-grid">
+            <div class="card">
+                <h4>Key Specifications</h4>
+                <ul>
+                    <li>Dual-core Xtensa LX6 @ 240 MHz</li>
+                    <li>520 KB SRAM, 4 MB Flash (typical)</li>
+                    <li>WiFi 802.11 b/g/n</li>
+                    <li>Bluetooth 4.2 + BLE</li>
+                    <li>34 GPIO pins</li>
+                    <li>ADC, DAC, PWM, I2C, SPI, UART</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Common Use Cases</h4>
+                <ul>
+                    <li>Smart home devices</li>
+                    <li>Wearables</li>
+                    <li>Industrial IoT sensors</li>
+                    <li>Environmental monitoring</li>
+                    <li>Robotics projects</li>
+                    <li>Mesh networking</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Development Options</h3>
+        <p>There are two main approaches to developing for ESP32:</p>
+
+        <table>
+            <tr>
+                <th>Aspect</th>
+                <th>Arduino IDE</th>
+                <th>ESP-IDF</th>
+            </tr>
+            <tr>
+                <td>Philosophy</td>
+                <td>Simplicity</td>
+                <td>Full Control</td>
+            </tr>
+            <tr>
+                <td>Learning Curve</td>
+                <td>Low</td>
+                <td>Steep</td>
+            </tr>
+            <tr>
+                <td>Setup Time</td>
+                <td>Minutes</td>
+                <td>Hours</td>
+            </tr>
+            <tr>
+                <td>Target User</td>
+                <td>Hobbyists, Students</td>
+                <td>Professionals</td>
+            </tr>
+            <tr>
+                <td>RTOS</td>
+                <td>Hidden/Optional</td>
+                <td>FreeRTOS Built-in</td>
+            </tr>
+        </table>
+
+        <div class="alert alert-info">
+            <strong>Course Approach:</strong> We'll start with Arduino for quick prototyping, then transition to ESP-IDF for professional development. QEMU emulation will be used throughout for development without hardware.
+        </div>
+    </div>
+
+    <!-- Arduino Tab -->
+    <div id="arduino" class="tab-content">
+        <h2>Arduino IDE for ESP32</h2>
+
+        <h3>What is Arduino?</h3>
+        <p>Arduino is an open-source electronics platform with a simple IDE and easy-to-use API. Programs are called "sketches" and use two main functions:</p>
+        <ul>
+            <li><code>setup()</code> - Runs once at startup</li>
+            <li><code>loop()</code> - Runs repeatedly forever</li>
+        </ul>
+
+        <div class="card-grid">
+            <div class="card success">
+                <h4>Advantages</h4>
+                <ul>
+                    <li>Easy to start - install, write, upload</li>
+                    <li>Vast library ecosystem (1000s of libraries)</li>
+                    <li>Huge community support</li>
+                    <li>Great for rapid prototyping</li>
+                    <li>Extensive tutorials available</li>
+                </ul>
+            </div>
+            <div class="card warning">
+                <h4>Limitations</h4>
+                <ul>
+                    <li>Abstraction adds overhead</li>
+                    <li>Limited optimization options</li>
+                    <li>Hidden complexity makes debugging hard</li>
+                    <li>Less control over hardware</li>
+                    <li>Not ideal for production</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Blink Example</h3>
+        <pre><code>#define LED_PIN 2
+
+void setup() {
+    Serial.begin(115200);
+    pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+    digitalWrite(LED_PIN, HIGH);
+    Serial.println("LED ON");
+    delay(1000);
+
+    digitalWrite(LED_PIN, LOW);
+    Serial.println("LED OFF");
+    delay(1000);
+}</code></pre>
+
+        <h3>GPIO Read Example</h3>
+        <pre><code>#define BUTTON_PIN 4
+#define LED_PIN 2
+
+void setup() {
+    Serial.begin(115200);
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
+    pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+    int buttonState = digitalRead(BUTTON_PIN);
+
+    if (buttonState == LOW) {  // Pressed
+        digitalWrite(LED_PIN, HIGH);
+        Serial.println("Button PRESSED");
+    } else {
+        digitalWrite(LED_PIN, LOW);
+    }
+    delay(50);  // Debounce
+}</code></pre>
+
+        <div class="alert alert-warning">
+            <strong>Note:</strong> <code>delay()</code> blocks execution - other code cannot run during the delay. This is a hidden limitation of the Arduino approach.
+        </div>
+    </div>
+
+    <!-- ESP-IDF Tab -->
+    <div id="espidf" class="tab-content">
+        <h2>ESP-IDF Framework</h2>
+
+        <h3>What is ESP-IDF?</h3>
+        <p>ESP-IDF (Espressif IoT Development Framework) is the official SDK from Espressif. It's built on FreeRTOS and provides full access to all hardware features.</p>
+
+        <h4>Components</h4>
+        <ul>
+            <li>Toolchain (compiler, linker)</li>
+            <li>Build system (CMake-based)</li>
+            <li>FreeRTOS kernel</li>
+            <li>Component libraries (WiFi, BT, drivers)</li>
+            <li>Debugging tools (GDB, OpenOCD)</li>
+        </ul>
+
+        <div class="card-grid">
+            <div class="card success">
+                <h4>Advantages</h4>
+                <ul>
+                    <li>Full hardware control</li>
+                    <li>Better performance</li>
+                    <li>Professional features (secure boot, OTA)</li>
+                    <li>FreeRTOS for real-time tasks</li>
+                    <li>Dual-core utilization</li>
+                </ul>
+            </div>
+            <div class="card warning">
+                <h4>Limitations</h4>
+                <ul>
+                    <li>Steeper learning curve</li>
+                    <li>More setup required</li>
+                    <li>Verbose code</li>
+                    <li>Fewer community tutorials</li>
+                    <li>More documentation reading</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Blink Example</h3>
+        <pre><code>#include &lt;stdio.h&gt;
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+#include "esp_log.h"
+
+#define LED_PIN GPIO_NUM_2
+
+static const char *TAG = "BLINK";
+
+void app_main(void)
+{
+    ESP_LOGI(TAG, "Configuring GPIO...");
+
+    gpio_config_t io_conf = {
+        .pin_bit_mask = (1ULL &lt;&lt; LED_PIN),
+        .mode = GPIO_MODE_OUTPUT,
+    };
+    gpio_config(&amp;io_conf);
+
+    int led_state = 0;
+    while (1) {
+        led_state = !led_state;
+        gpio_set_level(LED_PIN, led_state);
+        ESP_LOGI(TAG, "LED %s", led_state ? "ON" : "OFF");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}</code></pre>
+
+        <div class="alert alert-success">
+            <strong>Key Difference:</strong> <code>vTaskDelay()</code> is non-blocking - other FreeRTOS tasks can run during the delay!
+        </div>
+
+        <h3>Project Structure</h3>
+        <pre><code>my_project/
+├── CMakeLists.txt          # Project CMake file
+├── main/
+│   ├── CMakeLists.txt      # Component CMake file
+│   └── main.c              # Your code
+├── build/                  # Build output
+└── sdkconfig               # Configuration</code></pre>
+
+        <h3>Build Commands</h3>
+        <pre><code># Set up environment (in Docker, this is automatic)
+source $IDF_PATH/export.sh
+
+# Configure project
+idf.py menuconfig
+
+# Build
+idf.py build
+
+# Flash to device
+idf.py flash
+
+# Monitor serial output
+idf.py monitor</code></pre>
+    </div>
+
+    <!-- Comparison Tab -->
+    <div id="comparison" class="tab-content">
+        <h2>Arduino vs ESP-IDF Comparison</h2>
+
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>Arduino IDE</th>
+                <th>ESP-IDF</th>
+            </tr>
+            <tr>
+                <td>Setup Time</td>
+                <td>10 minutes</td>
+                <td>1-2 hours</td>
+            </tr>
+            <tr>
+                <td>First Program</td>
+                <td>5 minutes</td>
+                <td>30 minutes</td>
+            </tr>
+            <tr>
+                <td>Code Complexity</td>
+                <td>Low</td>
+                <td>Medium-High</td>
+            </tr>
+            <tr>
+                <td>Performance</td>
+                <td>Good</td>
+                <td>Excellent</td>
+            </tr>
+            <tr>
+                <td>Power Optimization</td>
+                <td>Limited</td>
+                <td>Full Control</td>
+            </tr>
+            <tr>
+                <td>Debugging</td>
+                <td>Basic Serial</td>
+                <td>GDB + OpenOCD</td>
+            </tr>
+            <tr>
+                <td>Multi-tasking</td>
+                <td>Manual</td>
+                <td>FreeRTOS Tasks</td>
+            </tr>
+            <tr>
+                <td>Security Features</td>
+                <td>Basic</td>
+                <td>Enterprise-grade</td>
+            </tr>
+            <tr>
+                <td>OTA Updates</td>
+                <td>Library-based</td>
+                <td>Built-in</td>
+            </tr>
+            <tr>
+                <td>Community Size</td>
+                <td>Very Large</td>
+                <td>Large</td>
+            </tr>
+        </table>
+
+        <h3>When to Use Which?</h3>
+
+        <div class="card-grid">
+            <div class="card info">
+                <h4>Choose Arduino When:</h4>
+                <ul>
+                    <li>Learning embedded basics</li>
+                    <li>Quick prototype needed</li>
+                    <li>Using existing libraries</li>
+                    <li>One-off hobby project</li>
+                    <li>Time is limited</li>
+                    <li>Performance isn't critical</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Choose ESP-IDF When:</h4>
+                <ul>
+                    <li>Building a product</li>
+                    <li>Need maximum performance</li>
+                    <li>Power consumption matters</li>
+                    <li>Security is required</li>
+                    <li>Using advanced features</li>
+                    <li>Learning professional embedded</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="alert alert-success">
+            <strong>Pro Tip:</strong> Start with Arduino to validate your idea, then port to ESP-IDF for production!
+        </div>
+    </div>
+
+    <!-- Docker Setup Tab -->
+    <div id="docker" class="tab-content">
+        <h2>Docker Setup</h2>
+
+        <h3>Why Docker?</h3>
+        <ul>
+            <li>Consistent environment for everyone</li>
+            <li>No need to install ESP-IDF locally</li>
+            <li>QEMU pre-configured</li>
+            <li>Works on Windows, Mac, Linux</li>
+        </ul>
+
+        <h3>Build the Docker Image</h3>
+        <pre><code># Navigate to the course directory
+cd esp32-qemu
+
+# Build the image (takes 10-15 minutes)
+docker build -t esp32-qemu .</code></pre>
+
+        <h3>Run the Container</h3>
+        <pre><code># Interactive shell with project mounted
+docker run -it --rm -v "$(pwd)":/workspace esp32-qemu
+
+# Or mount a specific directory
+docker run -it --rm -v "/path/to/project":/workspace esp32-qemu</code></pre>
+
+        <h3>Verify Installation</h3>
+        <pre><code># Inside the container, check tools:
+xtensa-esp32-elf-gcc --version
+qemu-system-xtensa --version
+idf.py --version</code></pre>
+
+        <h3>Docker Commands Reference</h3>
+        <table>
+            <tr>
+                <th>Command</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td><code>docker images</code></td>
+                <td>List built images</td>
+            </tr>
+            <tr>
+                <td><code>docker ps</code></td>
+                <td>List running containers</td>
+            </tr>
+            <tr>
+                <td><code>docker ps -a</code></td>
+                <td>List all containers</td>
+            </tr>
+            <tr>
+                <td><code>docker stop &lt;id&gt;</code></td>
+                <td>Stop a container</td>
+            </tr>
+            <tr>
+                <td><code>docker kill $(docker ps -q)</code></td>
+                <td>Kill all running containers</td>
+            </tr>
+            <tr>
+                <td><code>exit</code></td>
+                <td>Exit container shell</td>
+            </tr>
+        </table>
+
+        <div class="alert alert-info">
+            <strong>Tip:</strong> Use <code>--rm</code> flag to automatically remove the container when you exit.
+        </div>
+    </div>
+
+    <!-- QEMU Tab -->
+    <div id="qemu" class="tab-content">
+        <h2>QEMU Emulation</h2>
+
+        <h3>Why Emulation?</h3>
+        <div class="card-grid">
+            <div class="card success">
+                <h4>Benefits</h4>
+                <ul>
+                    <li>No hardware required</li>
+                    <li>Better debugging visibility</li>
+                    <li>CI/CD testing pipelines</li>
+                    <li>Can't damage virtual hardware</li>
+                    <li>Same environment for everyone</li>
+                </ul>
+            </div>
+            <div class="card warning">
+                <h4>Limitations</h4>
+                <ul>
+                    <li>No WiFi / Bluetooth</li>
+                    <li>No real sensors</li>
+                    <li>Limited analog (ADC/DAC)</li>
+                    <li>Some peripherals missing</li>
+                    <li>Timing not exact</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Complete Workflow</h3>
+
+        <h4>Step 1: Start Container</h4>
+        <pre><code>docker run -it --rm -v "$(pwd)":/workspace esp32-qemu</code></pre>
+
+        <h4>Step 2: Copy or Create Project</h4>
+        <pre><code># Use built-in example
+cp -r $IDF_PATH/examples/get-started/blink /workspace/
+cd /workspace/blink</code></pre>
+
+        <h4>Step 3: Build</h4>
+        <pre><code>idf.py build</code></pre>
+
+        <h4>Step 4: Create Flash Image</h4>
+        <pre><code>esptool.py --chip esp32 merge_bin \
+    --fill-flash-size 4MB \
+    -o build/flash_image.bin \
+    --flash_mode dio \
+    --flash_size 4MB \
+    0x1000 build/bootloader/bootloader.bin \
+    0x8000 build/partition_table/partition-table.bin \
+    0x10000 build/blink.bin</code></pre>
+
+        <div class="alert alert-warning">
+            <strong>Important:</strong> The <code>--fill-flash-size 4MB</code> flag is required! QEMU only accepts 2, 4, 8, or 16 MB flash images.
+        </div>
+
+        <h4>Step 5: Run in QEMU</h4>
+        <pre><code>qemu-system-xtensa -nographic \
+    -machine esp32 \
+    -drive file=build/flash_image.bin,if=mtd,format=raw</code></pre>
+
+        <h3>Easy Method: Using run_qemu.sh</h3>
+        <div class="alert alert-success">
+            <strong>Recommended:</strong> Use the helper script for a simpler workflow!
+        </div>
+
+        <p>A helper script <code>run_qemu.sh</code> is provided in the project root that automates Steps 4-5:</p>
+
+        <pre><code>#!/bin/bash
+# run_qemu.sh - Build and run ESP32 project in QEMU
+
+set -e
+
+# Find the project binary name
+if [ -f "build/blink.bin" ]; then
+    APP_BIN="build/blink.bin"
+elif [ -f "build/espidf_blink.bin" ]; then
+    APP_BIN="build/espidf_blink.bin"
+else
+    APP_BIN=$(ls build/*.bin 2>/dev/null | grep -v bootloader | grep -v partition | head -1)
+fi
+
+echo "Using app binary: $APP_BIN"
+
+echo "Creating 4MB flash image..."
+esptool.py --chip esp32 merge_bin \
+    --fill-flash-size 4MB \
+    -o build/flash_image.bin \
+    --flash_mode dio \
+    --flash_size 4MB \
+    0x1000 build/bootloader/bootloader.bin \
+    0x8000 build/partition_table/partition-table.bin \
+    0x10000 $APP_BIN
+
+echo "Starting QEMU (Ctrl+A, X to exit)..."
+qemu-system-xtensa -nographic \
+    -machine esp32 \
+    -drive file=build/flash_image.bin,if=mtd,format=raw</code></pre>
+
+        <h4>Usage</h4>
+        <pre><code># Start container with project and script mounted
+docker run -it --rm -v "$(pwd)":/workspace esp32-qemu
+
+# Copy example and build
+cp -r $IDF_PATH/examples/get-started/blink /workspace/
+cd /workspace/blink
+idf.py build
+
+# Run the helper script
+chmod +x ../run_qemu.sh
+../run_qemu.sh</code></pre>
+
+        <h3>Exiting QEMU</h3>
+
+        <table>
+            <tr>
+                <th>Environment</th>
+                <th>Key Sequence</th>
+            </tr>
+            <tr>
+                <td>Normal terminal</td>
+                <td><kbd>Ctrl</kbd>+<kbd>A</kbd>, then <kbd>X</kbd></td>
+            </tr>
+            <tr>
+                <td>Inside <code>screen</code></td>
+                <td><kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>A</kbd>, then <kbd>X</kbd></td>
+            </tr>
+            <tr>
+                <td>Inside <code>tmux</code></td>
+                <td><kbd>Ctrl</kbd>+<kbd>A</kbd>, then <kbd>X</kbd> (if prefix changed)</td>
+            </tr>
+            <tr>
+                <td>Alternative</td>
+                <td><kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>C</kbd>, then type <code>quit</code></td>
+            </tr>
+            <tr>
+                <td>Force kill</td>
+                <td><code>docker kill $(docker ps -q)</code></td>
+            </tr>
+        </table>
+
+        <div class="alert alert-info">
+            <strong>Screen Users:</strong> Since <code>screen</code> uses <kbd>Ctrl</kbd>+<kbd>A</kbd> as its command key, you need to press <kbd>Ctrl</kbd>+<kbd>A</kbd> twice (i.e., <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>A</kbd>) to send it through to QEMU.
+        </div>
+    </div>
+
+    <!-- Code Explained Tab -->
+    <div id="programs" class="tab-content">
+        <h2>Code Explained</h2>
+        <p>Detailed line-by-line explanations of ESP32 programs to help you understand what each part does.</p>
+
+        <!-- ESP-IDF Blink Example -->
+        <h3>ESP-IDF Blink Example</h3>
+        <p>This program blinks an LED on GPIO 2 using the ESP-IDF framework with FreeRTOS.</p>
+
+        <h4>Include Headers</h4>
+        <pre><code>#include &lt;stdio.h&gt;
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+#include "esp_log.h"</code></pre>
+
+        <table>
+            <tr>
+                <th>Header</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td><code>stdio.h</code></td>
+                <td>Standard C I/O functions (printf, etc.)</td>
+            </tr>
+            <tr>
+                <td><code>freertos/FreeRTOS.h</code></td>
+                <td>FreeRTOS kernel definitions and types</td>
+            </tr>
+            <tr>
+                <td><code>freertos/task.h</code></td>
+                <td>Task functions like <code>vTaskDelay()</code></td>
+            </tr>
+            <tr>
+                <td><code>driver/gpio.h</code></td>
+                <td>GPIO control functions</td>
+            </tr>
+            <tr>
+                <td><code>esp_log.h</code></td>
+                <td>Logging macros (ESP_LOGI, ESP_LOGE, etc.)</td>
+            </tr>
+        </table>
+
+        <h4>Definitions</h4>
+        <pre><code>#define LED_PIN GPIO_NUM_2
+#define BLINK_PERIOD_MS 1000
+
+static const char *TAG = "BLINK";</code></pre>
+
+        <table>
+            <tr>
+                <th>Line</th>
+                <th>Explanation</th>
+            </tr>
+            <tr>
+                <td><code>GPIO_NUM_2</code></td>
+                <td>ESP-IDF enum for GPIO pin 2 (built-in LED on most boards)</td>
+            </tr>
+            <tr>
+                <td><code>BLINK_PERIOD_MS</code></td>
+                <td>Delay between toggles in milliseconds</td>
+            </tr>
+            <tr>
+                <td><code>TAG</code></td>
+                <td>Label for log messages - appears as <code>I (123) BLINK: message</code></td>
+            </tr>
+        </table>
+
+        <h4>GPIO Configuration</h4>
+        <pre><code>gpio_config_t io_conf = {
+    .pin_bit_mask = (1ULL &lt;&lt; LED_PIN),
+    .mode = GPIO_MODE_OUTPUT,
+    .pull_up_en = GPIO_PULLUP_DISABLE,
+    .pull_down_en = GPIO_PULLDOWN_DISABLE,
+    .intr_type = GPIO_INTR_DISABLE
+};
+gpio_config(&amp;io_conf);</code></pre>
+
+        <table>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+                <th>Explanation</th>
+            </tr>
+            <tr>
+                <td><code>pin_bit_mask</code></td>
+                <td><code>(1ULL &lt;&lt; LED_PIN)</code></td>
+                <td>Bitmask selecting which pins to configure. <code>1ULL &lt;&lt; 2</code> = <code>0b100</code> = pin 2</td>
+            </tr>
+            <tr>
+                <td><code>mode</code></td>
+                <td><code>GPIO_MODE_OUTPUT</code></td>
+                <td>Pin direction: OUTPUT (can also be INPUT, INPUT_OUTPUT)</td>
+            </tr>
+            <tr>
+                <td><code>pull_up_en</code></td>
+                <td><code>DISABLE</code></td>
+                <td>Internal pull-up resistor (not needed for output)</td>
+            </tr>
+            <tr>
+                <td><code>pull_down_en</code></td>
+                <td><code>DISABLE</code></td>
+                <td>Internal pull-down resistor</td>
+            </tr>
+            <tr>
+                <td><code>intr_type</code></td>
+                <td><code>DISABLE</code></td>
+                <td>No interrupt on this pin</td>
+            </tr>
+        </table>
+
+        <div class="alert alert-info">
+            <strong>Why use <code>gpio_config()</code>?</strong> It configures multiple settings atomically. You could also use individual functions like <code>gpio_set_direction()</code>, but this is cleaner and more efficient.
+        </div>
+
+        <h4>The Main Loop</h4>
+        <pre><code>int led_state = 0;
+while (1) {
+    led_state = !led_state;
+    gpio_set_level(LED_PIN, led_state);
+    ESP_LOGI(TAG, "LED %s", led_state ? "ON" : "OFF");
+    vTaskDelay(pdMS_TO_TICKS(BLINK_PERIOD_MS));
+}</code></pre>
+
+        <table>
+            <tr>
+                <th>Line</th>
+                <th>Explanation</th>
+            </tr>
+            <tr>
+                <td><code>led_state = !led_state</code></td>
+                <td>Toggle: 0→1 or 1→0</td>
+            </tr>
+            <tr>
+                <td><code>gpio_set_level()</code></td>
+                <td>Set pin HIGH (1) or LOW (0)</td>
+            </tr>
+            <tr>
+                <td><code>ESP_LOGI()</code></td>
+                <td>Log info message (I=Info, E=Error, W=Warning, D=Debug)</td>
+            </tr>
+            <tr>
+                <td><code>vTaskDelay()</code></td>
+                <td>Pause task, let other tasks run (non-blocking)</td>
+            </tr>
+            <tr>
+                <td><code>pdMS_TO_TICKS()</code></td>
+                <td>Convert milliseconds to FreeRTOS ticks</td>
+            </tr>
+        </table>
+
+        <h4>Understanding vTaskDelay()</h4>
+        <pre><code>vTaskDelay(pdMS_TO_TICKS(1000));
+// Equivalent to:
+vTaskDelay(1000 / portTICK_PERIOD_MS);</code></pre>
+
+        <div class="card info">
+            <h4>How vTaskDelay() Works</h4>
+            <table>
+                <tr>
+                    <th>Part</th>
+                    <th>Meaning</th>
+                </tr>
+                <tr>
+                    <td><code>1000</code></td>
+                    <td>Delay time in milliseconds</td>
+                </tr>
+                <tr>
+                    <td><code>portTICK_PERIOD_MS</code></td>
+                    <td>Duration of one FreeRTOS tick (typically 10ms)</td>
+                </tr>
+                <tr>
+                    <td><code>1000 / 10 = 100</code></td>
+                    <td>Number of ticks to wait</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card success">
+            <h4>vTaskDelay() vs Arduino delay()</h4>
+            <table>
+                <tr>
+                    <th>Arduino <code>delay()</code></th>
+                    <th>FreeRTOS <code>vTaskDelay()</code></th>
+                </tr>
+                <tr>
+                    <td>Blocks CPU completely</td>
+                    <td>Yields CPU to other tasks</td>
+                </tr>
+                <tr>
+                    <td>Nothing else can run</td>
+                    <td>Other tasks execute during delay</td>
+                </tr>
+                <tr>
+                    <td>Wastes CPU cycles</td>
+                    <td>Efficient multitasking</td>
+                </tr>
+            </table>
+        </div>
+
+        <hr style="margin: 40px 0;">
+
+        <!-- ESP-IDF GPIO Input Example -->
+        <h3>ESP-IDF GPIO Input with Interrupts</h3>
+        <p>This program reads a button and toggles an LED using hardware interrupts.</p>
+
+        <h4>Interrupt Service Routine (ISR)</h4>
+        <pre><code>static void IRAM_ATTR gpio_isr_handler(void *arg)
+{
+    uint32_t gpio_num = (uint32_t)arg;
+    xQueueSendFromISR(gpio_evt_queue, &amp;gpio_num, NULL);
+}</code></pre>
+
+        <table>
+            <tr>
+                <th>Part</th>
+                <th>Explanation</th>
+            </tr>
+            <tr>
+                <td><code>IRAM_ATTR</code></td>
+                <td>Places function in RAM (required for ISRs - faster than flash)</td>
+            </tr>
+            <tr>
+                <td><code>void *arg</code></td>
+                <td>Argument passed when handler was registered (the GPIO number)</td>
+            </tr>
+            <tr>
+                <td><code>xQueueSendFromISR()</code></td>
+                <td>Send data to queue from interrupt context (ISR-safe version)</td>
+            </tr>
+        </table>
+
+        <div class="alert alert-warning">
+            <strong>ISR Rules:</strong>
+            <ul>
+                <li>Keep ISRs short - do minimal work</li>
+                <li>Don't use <code>printf()</code> or <code>ESP_LOG</code> in ISRs</li>
+                <li>Use <code>FromISR</code> versions of FreeRTOS functions</li>
+                <li>Send event to a task for complex processing</li>
+            </ul>
+        </div>
+
+        <h4>Queue for Communication</h4>
+        <pre><code>static QueueHandle_t gpio_evt_queue = NULL;
+
+// In app_main():
+gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));</code></pre>
+
+        <table>
+            <tr>
+                <th>Parameter</th>
+                <th>Value</th>
+                <th>Meaning</th>
+            </tr>
+            <tr>
+                <td>Queue length</td>
+                <td><code>10</code></td>
+                <td>Can hold 10 items before blocking</td>
+            </tr>
+            <tr>
+                <td>Item size</td>
+                <td><code>sizeof(uint32_t)</code></td>
+                <td>Each item is 4 bytes (GPIO number)</td>
+            </tr>
+        </table>
+
+        <div class="card info">
+            <h4>Why Use Queues?</h4>
+            <p>Queues provide safe communication between ISRs and tasks:</p>
+            <ul>
+                <li>ISR puts event in queue (fast, non-blocking)</li>
+                <li>Task waits on queue and processes events</li>
+                <li>No shared variable race conditions</li>
+            </ul>
+        </div>
+
+        <h4>Task Waiting on Queue</h4>
+        <pre><code>static void gpio_task(void *arg)
+{
+    uint32_t gpio_num;
+    while (1) {
+        if (xQueueReceive(gpio_evt_queue, &amp;gpio_num, portMAX_DELAY)) {
+            int level = gpio_get_level(gpio_num);
+            ESP_LOGI(TAG, "GPIO %lu level: %d", gpio_num, level);
+        }
+    }
+}</code></pre>
+
+        <table>
+            <tr>
+                <th>Function</th>
+                <th>Explanation</th>
+            </tr>
+            <tr>
+                <td><code>xQueueReceive()</code></td>
+                <td>Wait for item from queue, copy to <code>gpio_num</code></td>
+            </tr>
+            <tr>
+                <td><code>portMAX_DELAY</code></td>
+                <td>Wait forever until item arrives (blocks task)</td>
+            </tr>
+            <tr>
+                <td><code>gpio_get_level()</code></td>
+                <td>Read current pin state (0 or 1)</td>
+            </tr>
+        </table>
+
+        <h4>Setting Up the Interrupt</h4>
+        <pre><code>// Configure button pin
+gpio_config_t btn_conf = {
+    .pin_bit_mask = (1ULL &lt;&lt; BUTTON_PIN),
+    .mode = GPIO_MODE_INPUT,
+    .pull_up_en = GPIO_PULLUP_ENABLE,
+    .intr_type = GPIO_INTR_ANYEDGE
+};
+gpio_config(&amp;btn_conf);
+
+// Install ISR service and add handler
+gpio_install_isr_service(0);
+gpio_isr_handler_add(BUTTON_PIN, gpio_isr_handler, (void *)BUTTON_PIN);</code></pre>
+
+        <table>
+            <tr>
+                <th>Setting</th>
+                <th>Explanation</th>
+            </tr>
+            <tr>
+                <td><code>GPIO_MODE_INPUT</code></td>
+                <td>Pin is input (reading button state)</td>
+            </tr>
+            <tr>
+                <td><code>GPIO_PULLUP_ENABLE</code></td>
+                <td>Internal pull-up resistor (button connects to GND)</td>
+            </tr>
+            <tr>
+                <td><code>GPIO_INTR_ANYEDGE</code></td>
+                <td>Trigger interrupt on both press and release</td>
+            </tr>
+            <tr>
+                <td><code>gpio_install_isr_service()</code></td>
+                <td>Initialize the GPIO interrupt system</td>
+            </tr>
+            <tr>
+                <td><code>gpio_isr_handler_add()</code></td>
+                <td>Register our handler for this specific pin</td>
+            </tr>
+        </table>
+
+        <div class="card">
+            <h4>Interrupt Trigger Types</h4>
+            <table>
+                <tr>
+                    <th>Type</th>
+                    <th>When it triggers</th>
+                </tr>
+                <tr>
+                    <td><code>GPIO_INTR_POSEDGE</code></td>
+                    <td>Rising edge (0→1)</td>
+                </tr>
+                <tr>
+                    <td><code>GPIO_INTR_NEGEDGE</code></td>
+                    <td>Falling edge (1→0)</td>
+                </tr>
+                <tr>
+                    <td><code>GPIO_INTR_ANYEDGE</code></td>
+                    <td>Any change</td>
+                </tr>
+                <tr>
+                    <td><code>GPIO_INTR_LOW_LEVEL</code></td>
+                    <td>While pin is LOW</td>
+                </tr>
+                <tr>
+                    <td><code>GPIO_INTR_HIGH_LEVEL</code></td>
+                    <td>While pin is HIGH</td>
+                </tr>
+            </table>
+        </div>
+
+        <hr style="margin: 40px 0;">
+
+        <!-- Arduino vs ESP-IDF Comparison -->
+        <h3>Arduino vs ESP-IDF: Same Task, Different Code</h3>
+        <p>Compare how the same LED blink is implemented in both frameworks:</p>
+
+        <div class="card-grid">
+            <div class="card">
+                <h4>Arduino (12 lines)</h4>
+                <pre><code>#define LED_PIN 2
+
+void setup() {
+    pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+    digitalWrite(LED_PIN, HIGH);
+    delay(1000);
+    digitalWrite(LED_PIN, LOW);
+    delay(1000);
+}</code></pre>
+            </div>
+            <div class="card">
+                <h4>ESP-IDF (25 lines)</h4>
+                <pre><code>#include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+#define LED_PIN GPIO_NUM_2
+
+void app_main(void) {
+    gpio_config_t conf = {
+        .pin_bit_mask = (1ULL &lt;&lt; LED_PIN),
+        .mode = GPIO_MODE_OUTPUT,
+    };
+    gpio_config(&amp;conf);
+
+    int state = 0;
+    while (1) {
+        state = !state;
+        gpio_set_level(LED_PIN, state);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <table>
+            <tr>
+                <th>Aspect</th>
+                <th>Arduino</th>
+                <th>ESP-IDF</th>
+            </tr>
+            <tr>
+                <td>Pin setup</td>
+                <td><code>pinMode()</code> - one line</td>
+                <td><code>gpio_config()</code> - struct with options</td>
+            </tr>
+            <tr>
+                <td>Set output</td>
+                <td><code>digitalWrite()</code></td>
+                <td><code>gpio_set_level()</code></td>
+            </tr>
+            <tr>
+                <td>Delay</td>
+                <td><code>delay()</code> - blocking</td>
+                <td><code>vTaskDelay()</code> - non-blocking</td>
+            </tr>
+            <tr>
+                <td>Loop</td>
+                <td>Implicit (<code>loop()</code> repeats)</td>
+                <td>Explicit <code>while(1)</code></td>
+            </tr>
+        </table>
+
+        <div class="alert alert-success">
+            <strong>Key Insight:</strong> Arduino hides complexity to make code shorter. ESP-IDF exposes it to give you control. Both are valid - choose based on your needs!
+        </div>
+    </div>
+
+    <!-- ESP-IDF Tutorial Tab -->
+    <div id="tutorial" class="tab-content">
+        <h2>ESP-IDF Tutorial</h2>
+        <p>A step-by-step guide to understanding and using the ESP-IDF framework.</p>
+
+        <h3>1. Understanding the Project Structure</h3>
+        <p>Every ESP-IDF project follows this structure:</p>
+
+        <pre><code>my_project/
+├── CMakeLists.txt        # Top-level project file
+├── sdkconfig             # Configuration (generated by menuconfig)
+├── main/
+│   ├── CMakeLists.txt    # Component registration
+│   └── main.c            # Your application code
+├── components/           # Custom components (optional)
+│   └── my_component/
+│       ├── CMakeLists.txt
+│       ├── include/
+│       │   └── my_component.h
+│       └── my_component.c
+└── build/                # Build output (generated)</code></pre>
+
+        <table>
+            <tr>
+                <th>File</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td><code>CMakeLists.txt</code> (root)</td>
+                <td>Defines project name, includes ESP-IDF build system</td>
+            </tr>
+            <tr>
+                <td><code>main/CMakeLists.txt</code></td>
+                <td>Registers source files for the main component</td>
+            </tr>
+            <tr>
+                <td><code>sdkconfig</code></td>
+                <td>Configuration options (WiFi settings, log levels, etc.)</td>
+            </tr>
+            <tr>
+                <td><code>main/main.c</code></td>
+                <td>Contains <code>app_main()</code> - your entry point</td>
+            </tr>
+        </table>
+
+        <h4>Minimal CMakeLists.txt (root)</h4>
+        <pre><code>cmake_minimum_required(VERSION 3.16)
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(my_project)</code></pre>
+
+        <h4>Minimal main/CMakeLists.txt</h4>
+        <pre><code>idf_component_register(SRCS "main.c"
+                       INCLUDE_DIRS ".")</code></pre>
+
+        <h3>2. The Build System</h3>
+
+        <h4>Essential Commands</h4>
+        <table>
+            <tr>
+                <th>Command</th>
+                <th>What it does</th>
+            </tr>
+            <tr>
+                <td><code>idf.py create-project name</code></td>
+                <td>Create a new project from template</td>
+            </tr>
+            <tr>
+                <td><code>idf.py set-target esp32</code></td>
+                <td>Set target chip (esp32, esp32s2, esp32c3, etc.)</td>
+            </tr>
+            <tr>
+                <td><code>idf.py menuconfig</code></td>
+                <td>Open configuration menu (TUI)</td>
+            </tr>
+            <tr>
+                <td><code>idf.py build</code></td>
+                <td>Compile the project</td>
+            </tr>
+            <tr>
+                <td><code>idf.py flash</code></td>
+                <td>Flash to connected device</td>
+            </tr>
+            <tr>
+                <td><code>idf.py monitor</code></td>
+                <td>Open serial monitor</td>
+            </tr>
+            <tr>
+                <td><code>idf.py flash monitor</code></td>
+                <td>Flash and open monitor in one command</td>
+            </tr>
+            <tr>
+                <td><code>idf.py clean</code></td>
+                <td>Clean build files</td>
+            </tr>
+            <tr>
+                <td><code>idf.py fullclean</code></td>
+                <td>Remove entire build directory</td>
+            </tr>
+        </table>
+
+        <h3>3. FreeRTOS Basics</h3>
+        <p>ESP-IDF is built on FreeRTOS, a real-time operating system. Understanding these concepts is essential:</p>
+
+        <h4>Tasks</h4>
+        <p>Tasks are like threads - independent units of execution.</p>
+
+        <pre><code>// Create a task
+void my_task(void *pvParameters) {
+    while (1) {
+        // Do work
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+}
+
+void app_main(void) {
+    xTaskCreate(
+        my_task,          // Function
+        "my_task",        // Name (for debugging)
+        2048,             // Stack size (bytes)
+        NULL,             // Parameters
+        5,                // Priority (higher = more important)
+        NULL              // Task handle (optional)
+    );
+}</code></pre>
+
+        <table>
+            <tr>
+                <th>Parameter</th>
+                <th>Typical Values</th>
+                <th>Notes</th>
+            </tr>
+            <tr>
+                <td>Stack size</td>
+                <td>2048 - 8192</td>
+                <td>Increase if you get stack overflow</td>
+            </tr>
+            <tr>
+                <td>Priority</td>
+                <td>0 - 24</td>
+                <td>0 = idle, higher = more CPU time</td>
+            </tr>
+        </table>
+
+        <h4>Delays</h4>
+        <pre><code>// Non-blocking delay (lets other tasks run)
+vTaskDelay(pdMS_TO_TICKS(1000));  // 1 second
+
+// Precise periodic timing
+TickType_t xLastWakeTime = xTaskGetTickCount();
+while (1) {
+    vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(100));
+    // Executes exactly every 100ms
+}</code></pre>
+
+        <h4>Queues</h4>
+        <p>Safe way to pass data between tasks:</p>
+
+        <pre><code>QueueHandle_t queue;
+
+void sender_task(void *arg) {
+    int data = 42;
+    xQueueSend(queue, &data, portMAX_DELAY);
+}
+
+void receiver_task(void *arg) {
+    int received;
+    if (xQueueReceive(queue, &received, portMAX_DELAY)) {
+        printf("Got: %d\n", received);
+    }
+}
+
+void app_main(void) {
+    queue = xQueueCreate(10, sizeof(int));
+    xTaskCreate(sender_task, "sender", 2048, NULL, 5, NULL);
+    xTaskCreate(receiver_task, "receiver", 2048, NULL, 5, NULL);
+}</code></pre>
+
+        <h4>Semaphores & Mutexes</h4>
+        <pre><code>SemaphoreHandle_t mutex;
+
+void app_main(void) {
+    mutex = xSemaphoreCreateMutex();
+}
+
+void safe_function(void) {
+    if (xSemaphoreTake(mutex, portMAX_DELAY)) {
+        // Critical section - only one task at a time
+        // Access shared resource here
+        xSemaphoreGive(mutex);
+    }
+}</code></pre>
+
+        <h3>4. Logging System</h3>
+        <p>ESP-IDF has a powerful logging system with different levels:</p>
+
+        <pre><code>#include "esp_log.h"
+
+static const char *TAG = "MY_MODULE";
+
+void app_main(void) {
+    ESP_LOGE(TAG, "Error message");    // Red
+    ESP_LOGW(TAG, "Warning message");  // Yellow
+    ESP_LOGI(TAG, "Info message");     // Green
+    ESP_LOGD(TAG, "Debug message");    // (hidden by default)
+    ESP_LOGV(TAG, "Verbose message");  // (hidden by default)
+
+    // With formatting
+    int value = 42;
+    ESP_LOGI(TAG, "Value is %d", value);
+}</code></pre>
+
+        <table>
+            <tr>
+                <th>Level</th>
+                <th>Macro</th>
+                <th>Use for</th>
+            </tr>
+            <tr>
+                <td>Error</td>
+                <td><code>ESP_LOGE</code></td>
+                <td>Critical failures</td>
+            </tr>
+            <tr>
+                <td>Warning</td>
+                <td><code>ESP_LOGW</code></td>
+                <td>Potential issues</td>
+            </tr>
+            <tr>
+                <td>Info</td>
+                <td><code>ESP_LOGI</code></td>
+                <td>General information</td>
+            </tr>
+            <tr>
+                <td>Debug</td>
+                <td><code>ESP_LOGD</code></td>
+                <td>Debugging details</td>
+            </tr>
+            <tr>
+                <td>Verbose</td>
+                <td><code>ESP_LOGV</code></td>
+                <td>Everything</td>
+            </tr>
+        </table>
+
+        <div class="alert alert-info">
+            <strong>Tip:</strong> Set log level in menuconfig: <code>Component config → Log output → Default log verbosity</code>
+        </div>
+
+        <h3>5. Error Handling</h3>
+        <p>ESP-IDF uses <code>esp_err_t</code> return codes:</p>
+
+        <pre><code>#include "esp_err.h"
+
+esp_err_t result = some_function();
+
+// Method 1: Check and handle
+if (result != ESP_OK) {
+    ESP_LOGE(TAG, "Failed: %s", esp_err_to_name(result));
+    return;
+}
+
+// Method 2: Assert (crashes on error - good for development)
+ESP_ERROR_CHECK(some_function());
+
+// Method 3: Assert with return
+ESP_RETURN_ON_ERROR(some_function(), TAG, "Operation failed");</code></pre>
+
+        <table>
+            <tr>
+                <th>Error Code</th>
+                <th>Meaning</th>
+            </tr>
+            <tr>
+                <td><code>ESP_OK</code></td>
+                <td>Success (0)</td>
+            </tr>
+            <tr>
+                <td><code>ESP_FAIL</code></td>
+                <td>Generic failure</td>
+            </tr>
+            <tr>
+                <td><code>ESP_ERR_NO_MEM</code></td>
+                <td>Out of memory</td>
+            </tr>
+            <tr>
+                <td><code>ESP_ERR_INVALID_ARG</code></td>
+                <td>Invalid argument</td>
+            </tr>
+            <tr>
+                <td><code>ESP_ERR_TIMEOUT</code></td>
+                <td>Operation timed out</td>
+            </tr>
+        </table>
+
+        <h3>6. Common Patterns</h3>
+
+        <h4>GPIO Output</h4>
+        <pre><code>gpio_config_t conf = {
+    .pin_bit_mask = (1ULL << GPIO_NUM_2),
+    .mode = GPIO_MODE_OUTPUT,
+};
+gpio_config(&conf);
+gpio_set_level(GPIO_NUM_2, 1);  // HIGH
+gpio_set_level(GPIO_NUM_2, 0);  // LOW</code></pre>
+
+        <h4>GPIO Input</h4>
+        <pre><code>gpio_config_t conf = {
+    .pin_bit_mask = (1ULL << GPIO_NUM_4),
+    .mode = GPIO_MODE_INPUT,
+    .pull_up_en = GPIO_PULLUP_ENABLE,
+};
+gpio_config(&conf);
+int level = gpio_get_level(GPIO_NUM_4);</code></pre>
+
+        <h4>Timer (periodic callback)</h4>
+        <pre><code>#include "esp_timer.h"
+
+void timer_callback(void *arg) {
+    ESP_LOGI(TAG, "Timer fired!");
+}
+
+void app_main(void) {
+    esp_timer_create_args_t timer_args = {
+        .callback = timer_callback,
+        .name = "my_timer"
+    };
+    esp_timer_handle_t timer;
+    esp_timer_create(&timer_args, &timer);
+    esp_timer_start_periodic(timer, 1000000);  // 1 second (in microseconds)
+}</code></pre>
+
+        <h3>7. Debugging Tips</h3>
+
+        <div class="card-grid">
+            <div class="card info">
+                <h4>Serial Monitor</h4>
+                <ul>
+                    <li><code>idf.py monitor</code></li>
+                    <li>Exit with <kbd>Ctrl</kbd>+<kbd>]</kbd></li>
+                    <li>Reboot chip with <kbd>Ctrl</kbd>+<kbd>T</kbd>, <kbd>R</kbd></li>
+                </ul>
+            </div>
+            <div class="card info">
+                <h4>Stack Overflow</h4>
+                <ul>
+                    <li>Enable stack checking in menuconfig</li>
+                    <li>Increase task stack size</li>
+                    <li>Check with <code>uxTaskGetStackHighWaterMark()</code></li>
+                </ul>
+            </div>
+            <div class="card info">
+                <h4>Memory Issues</h4>
+                <ul>
+                    <li><code>esp_get_free_heap_size()</code></li>
+                    <li><code>heap_caps_get_free_size()</code></li>
+                    <li>Enable heap tracing in menuconfig</li>
+                </ul>
+            </div>
+            <div class="card info">
+                <h4>GDB Debugging</h4>
+                <ul>
+                    <li>In QEMU: add <code>-s -S</code> flags</li>
+                    <li>Connect: <code>xtensa-esp32-elf-gdb</code></li>
+                    <li><code>target remote :1234</code></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Case Studies Tab -->
+    <!-- Networking Tab -->
+    <div id="networking" class="tab-content">
+        <h2>Networking in QEMU</h2>
+        <p>ESP32 QEMU supports networking via an emulated <strong>OpenCores Ethernet</strong> MAC. While real ESP32 boards use WiFi, QEMU provides a virtual Ethernet NIC that connects through QEMU's <strong>slirp</strong> user-mode networking stack, giving the emulated ESP32 full TCP/IP access to the host and internet.</p>
+
+        <div class="alert alert-info">
+            <strong>Key Insight:</strong> WiFi and Bluetooth are <em>not</em> emulated in QEMU. Instead, we use the OpenCores Ethernet driver (<code>CONFIG_ETH_USE_OPENETH</code>) which gives us the same TCP/IP networking capabilities via a virtual wired connection.
+        </div>
+
+        <h3>Network Architecture</h3>
+        <pre><code>┌─────────────────────────────────────────────────────┐
+│  Docker Host (your machine)                         │
+│                                                     │
+│  ┌──────────────────┐  ┌────────────────────────┐   │
+│  │  esp32-qemu      │  │  api-server            │   │
+│  │  (QEMU + slirp)  │  │  (Flask on port 5000)  │   │
+│  │                  │  │                        │   │
+│  │  ESP32 app gets  │  │  Receives sensor data  │   │
+│  │  IP: 10.0.2.15   │  │  via REST API          │   │
+│  └────────┬─────────┘  └───────────┬────────────┘   │
+│           │                        │                │
+│           └──── esp32-net (Docker bridge) ───┘      │
+│                                                     │
+│  QEMU slirp gateway: 10.0.2.2 = Docker host        │
+│  ESP32 reaches api-server at http://10.0.2.2:5000   │
+└─────────────────────────────────────────────────────┘</code></pre>
+
+        <h4>How It Works</h4>
+        <ol>
+            <li>QEMU is launched with <code>-nic user,model=open_eth</code> which creates a virtual OpenCores Ethernet NIC</li>
+            <li>QEMU's <strong>slirp</strong> stack provides DHCP (assigns <code>10.0.2.15</code>) and NAT</li>
+            <li>The host machine is accessible at <code>10.0.2.2</code> from inside QEMU</li>
+            <li>Docker Compose exposes the API server on port 5000 on the host</li>
+            <li>The ESP32 app connects to <code>http://10.0.2.2:5000</code> to reach the API server</li>
+        </ol>
+
+        <h3>Project: REST API Client (<code>03-rest-api</code>)</h3>
+        <p>This project demonstrates an ESP32 making HTTP requests to a REST API server — a common IoT pattern where edge devices send sensor data to the cloud.</p>
+
+        <div class="card-grid">
+            <div class="card">
+                <h4>What It Does</h4>
+                <ul>
+                    <li>Initializes OpenCores Ethernet in QEMU</li>
+                    <li>Obtains IP address via DHCP (slirp)</li>
+                    <li>GET request to fetch device configuration</li>
+                    <li>POST requests to send simulated sensor readings (temperature, humidity)</li>
+                    <li>GET request to verify stored data on server</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Concepts Covered</h4>
+                <ul>
+                    <li>TCP/IP networking on embedded devices</li>
+                    <li>HTTP client (GET/POST) with <code>esp_http_client</code></li>
+                    <li>JSON payload construction</li>
+                    <li>Event-driven network initialization</li>
+                    <li>Docker microservices architecture</li>
+                </ul>
+            </div>
+        </div>
+
+        <h4>Running the Project</h4>
+        <pre><code># One command to start everything:
+./run-network-example.sh 03-rest-api
+
+# This script:
+# 1. Starts the API server container (Flask on port 5000)
+# 2. Builds the ESP32 project inside Docker
+# 3. Runs QEMU with networking enabled</code></pre>
+
+        <h4>Ethernet Initialization (OpenCores for QEMU)</h4>
+        <p>Unlike real ESP32 boards that use WiFi, QEMU uses the OpenCores Ethernet MAC. ESP-IDF provides a dedicated driver for this:</p>
+        <pre><code>#include "esp_eth.h"
+#include "esp_netif.h"
+#include "esp_event.h"
+
+static void init_ethernet(void)
+{
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+    // Create default Ethernet network interface
+    esp_netif_config_t netif_cfg = ESP_NETIF_DEFAULT_ETH();
+    esp_netif_t *eth_netif = esp_netif_new(&amp;netif_cfg);
+
+    // OpenCores Ethernet MAC — virtual NIC provided by QEMU
+    eth_mac_config_t mac_config = ETH_MAC_DEFAULT_CONFIG();
+    esp_eth_mac_t *mac = esp_eth_mac_new_openeth(&amp;mac_config);
+
+    // DP83848 PHY — emulated by QEMU's open_eth
+    eth_phy_config_t phy_config = ETH_PHY_DEFAULT_CONFIG();
+    phy_config.phy_addr = 0;
+    phy_config.reset_gpio_num = -1;
+    phy_config.autonego_timeout_ms = 100;  // QEMU resolves instantly
+    esp_eth_phy_t *phy = esp_eth_phy_new_dp83848(&amp;phy_config);
+
+    // Install driver and attach to TCP/IP stack
+    esp_eth_config_t eth_config = ETH_DEFAULT_CONFIG(mac, phy);
+    esp_eth_handle_t eth_handle = NULL;
+    ESP_ERROR_CHECK(esp_eth_driver_install(&amp;eth_config, &amp;eth_handle));
+    ESP_ERROR_CHECK(esp_netif_attach(eth_netif,
+                    esp_eth_new_netif_glue(eth_handle)));
+
+    // Start Ethernet — DHCP will assign 10.0.2.15
+    ESP_ERROR_CHECK(esp_eth_start(eth_handle));
+}</code></pre>
+
+        <div class="alert alert-warning">
+            <strong>QEMU Only:</strong> <code>esp_eth_mac_new_openeth()</code> only works in QEMU. On real hardware, you would use <code>esp_eth_mac_new_esp32()</code> (for wired Ethernet) or the WiFi driver. The driver includes a safety check that aborts if run on real silicon.
+        </div>
+
+        <h4>Making HTTP Requests</h4>
+        <p>Once the network is up, <code>esp_http_client</code> works just like on real hardware:</p>
+        <pre><code>// GET request
+esp_http_client_config_t config = {
+    .url = "http://10.0.2.2:5000/api/config",
+    .event_handler = http_event_handler,
+    .timeout_ms = 10000,
+};
+esp_http_client_handle_t client = esp_http_client_init(&amp;config);
+esp_http_client_perform(client);
+esp_http_client_cleanup(client);
+
+// POST request with JSON body
+char json[] = "{\"device\":\"esp32-qemu-01\","
+              "\"temperature\":25.3,\"humidity\":62.1}";
+esp_http_client_config_t post_config = {
+    .url = "http://10.0.2.2:5000/api/sensors",
+    .method = HTTP_METHOD_POST,
+    .timeout_ms = 10000,
+};
+client = esp_http_client_init(&amp;post_config);
+esp_http_client_set_header(client, "Content-Type", "application/json");
+esp_http_client_set_post_field(client, json, strlen(json));
+esp_http_client_perform(client);
+esp_http_client_cleanup(client);</code></pre>
+
+        <h4>The API Server</h4>
+        <p>A lightweight Flask server runs in a Docker container alongside QEMU, simulating a cloud backend:</p>
+        <pre><code># api-server/app.py (Flask REST API)
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+sensor_readings = []
+
+@app.route("/api/config", methods=["GET"])
+def get_config():
+    return jsonify({
+        "sample_interval_ms": 5000,
+        "device_name": "esp32-qemu-01",
+        "sensors_enabled": ["temperature", "humidity"]
+    })
+
+@app.route("/api/sensors", methods=["POST"])
+def post_sensor():
+    data = request.get_json()
+    sensor_readings.append(data)
+    return jsonify(data), 201
+
+@app.route("/api/sensors", methods=["GET"])
+def get_sensors():
+    return jsonify({"readings": sensor_readings})
+
+@app.route("/api/sensors/latest", methods=["GET"])
+def get_latest():
+    if not sensor_readings:
+        return jsonify({"error": "No readings yet"}), 404
+    return jsonify(sensor_readings[-1])</code></pre>
+
+        <h4>Required Configuration (<code>sdkconfig.defaults</code>)</h4>
+        <pre><code># Enable OpenCores Ethernet MAC (QEMU virtual NIC)
+CONFIG_ETH_USE_OPENETH=y
+
+# TCP/IP stack settings
+CONFIG_LWIP_DHCP_DOES_ARP_CHECK=n
+
+# HTTP client (no HTTPS needed for local server)
+CONFIG_ESP_HTTP_CLIENT_ENABLE_HTTPS=n
+
+# Disable hardware crypto (not emulated by QEMU)
+CONFIG_MBEDTLS_HARDWARE_AES=n
+CONFIG_MBEDTLS_HARDWARE_SHA=n
+CONFIG_MBEDTLS_HARDWARE_MPI=n
+
+# Flash size (match QEMU 4MB image)
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y</code></pre>
+
+        <h4>QEMU Networking Flag</h4>
+        <p>The key QEMU flag that enables networking:</p>
+        <pre><code># Standard QEMU run (no networking):
+qemu-system-xtensa -nographic -machine esp32 \
+    -drive file=build/merged-qemu.bin,if=mtd,format=raw
+
+# With networking enabled:
+qemu-system-xtensa -nographic -machine esp32 \
+    -drive file=build/merged-qemu.bin,if=mtd,format=raw \
+    -nic user,model=open_eth</code></pre>
+
+        <p>The <code>-nic user,model=open_eth</code> flag tells QEMU to:</p>
+        <ul>
+            <li><code>user</code> — use slirp user-mode networking (NAT, built-in DHCP)</li>
+            <li><code>model=open_eth</code> — emulate an OpenCores Ethernet MAC</li>
+        </ul>
+
+        <h4>Docker Compose Setup</h4>
+        <p>The <code>docker-compose.yml</code> includes the API server alongside the ESP32 development container:</p>
+        <pre><code>services:
+  esp32-dev:
+    image: esp32-qemu-dev:latest
+    volumes:
+      - ./projects:/workspace/projects
+      - ./scripts:/workspace/scripts:ro
+    networks:
+      - esp32-net
+
+  api-server:
+    build: ./api-server
+    image: iot-api-server:latest
+    ports:
+      - "5000:5000"       # Exposed on host for QEMU slirp access
+    networks:
+      - esp32-net
+
+networks:
+  esp32-net:
+    driver: bridge</code></pre>
+
+        <h3>Expected Demo Output</h3>
+        <p>When running <code>./run-network-example.sh 03-rest-api</code>, you should see output like:</p>
+        <pre><code>==========================================
+  ESP32 REST API Client (QEMU)
+  IoT Course - Spring 2026
+==========================================
+
+I (xxx) rest-api: Ethernet started
+I (xxx) rest-api: Ethernet link up
+I (xxx) rest-api: Got IP address: 10.0.2.15
+I (xxx) rest-api: Gateway:        10.0.2.2
+
+I (xxx) rest-api: ========================================
+I (xxx) rest-api: Step 1: Health check
+I (xxx) rest-api: GET http://10.0.2.2:5000/health
+I (xxx) rest-api: Response status=200, length=58
+I (xxx) rest-api: Body: {"status":"ok","timestamp":"..."}
+
+I (xxx) rest-api: Step 2: GET device configuration
+I (xxx) rest-api: GET http://10.0.2.2:5000/api/config
+I (xxx) rest-api: Body: {"device_name":"esp32-qemu-01",...}
+
+I (xxx) rest-api: Step 3: POST sensor readings (loop)
+I (xxx) rest-api: POST http://10.0.2.2:5000/api/sensors
+I (xxx) rest-api: Body: {"device":"esp32-qemu-01","temperature":24.3,...}
+I (xxx) rest-api: Response status=201
+
+... (5 readings sent, 3 seconds apart) ...
+
+I (xxx) rest-api: Step 4: GET all stored readings
+I (xxx) rest-api: Body: {"readings":[...],"count":5}
+
+==========================================
+  Demo complete!
+  Press Ctrl+A then X to exit QEMU
+==========================================</code></pre>
+
+        <h3>Real Hardware vs QEMU Comparison</h3>
+        <table>
+            <tr>
+                <th>Aspect</th>
+                <th>Real ESP32</th>
+                <th>QEMU ESP32</th>
+            </tr>
+            <tr>
+                <td>Network Interface</td>
+                <td>WiFi (<code>esp_wifi</code>)</td>
+                <td>Ethernet (<code>esp_eth_mac_new_openeth</code>)</td>
+            </tr>
+            <tr>
+                <td>IP Assignment</td>
+                <td>WiFi router DHCP</td>
+                <td>QEMU slirp DHCP (10.0.2.x)</td>
+            </tr>
+            <tr>
+                <td>HTTP Client</td>
+                <td><code>esp_http_client</code></td>
+                <td><code>esp_http_client</code> (identical)</td>
+            </tr>
+            <tr>
+                <td>MQTT Client</td>
+                <td><code>esp_mqtt_client</code></td>
+                <td><code>esp_mqtt_client</code> (identical)</td>
+            </tr>
+            <tr>
+                <td>TLS/HTTPS</td>
+                <td>Hardware-accelerated</td>
+                <td>Software only (disable HW crypto)</td>
+            </tr>
+            <tr>
+                <td>Application Code</td>
+                <td colspan="2" style="text-align:center"><strong>Identical</strong> — only the network init differs</td>
+            </tr>
+        </table>
+
+        <div class="alert alert-success">
+            <strong>Takeaway:</strong> Once the network interface is initialized, all application-level code (HTTP, MQTT, WebSocket, etc.) is <em>identical</em> between real hardware and QEMU. You can develop and test your cloud communication logic entirely in the emulator, then swap the network init for WiFi when deploying to real hardware.
+        </div>
+
+        <h3>Project Files</h3>
+        <pre><code>projects/03-rest-api/
+├── CMakeLists.txt              # ESP-IDF project file
+├── sdkconfig.defaults          # OpenCores Ethernet + HTTP config
+└── main/
+    ├── CMakeLists.txt          # Component registration
+    └── main.c                  # Ethernet init + HTTP GET/POST
+
+api-server/
+├── Dockerfile                  # Python 3.11 slim image
+├── requirements.txt            # Flask dependency
+└── app.py                      # REST API endpoints</code></pre>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #e8eaf6;">
+
+        <!-- MQTT Section -->
+        <h2>MQTT Pub/Sub in QEMU</h2>
+        <p><strong>MQTT</strong> (Message Queuing Telemetry Transport) is the de facto standard messaging protocol for IoT. It uses a lightweight <strong>publish/subscribe</strong> model where devices communicate through a central <strong>broker</strong> rather than directly with each other.</p>
+
+        <div class="card-grid">
+            <div class="card info">
+                <h4>Why MQTT for IoT?</h4>
+                <ul>
+                    <li>Extremely lightweight (2-byte minimum header)</li>
+                    <li>Designed for unreliable networks</li>
+                    <li>Built-in QoS levels (0, 1, 2)</li>
+                    <li>Last Will Testament for disconnect detection</li>
+                    <li>Retained messages for state persistence</li>
+                    <li>Wildcard topic subscriptions</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>MQTT vs REST for IoT</h4>
+                <ul>
+                    <li>REST: request/response, client pulls data</li>
+                    <li>MQTT: event-driven, broker pushes data</li>
+                    <li>REST: higher overhead (HTTP headers)</li>
+                    <li>MQTT: minimal overhead (2-byte header)</li>
+                    <li>REST: point-to-point</li>
+                    <li>MQTT: one-to-many via topics</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>MQTT Architecture</h3>
+        <pre><code>                    ┌─────────────────────────┐
+                    │   Mosquitto Broker      │
+                    │   (Docker container)    │
+                    │   Port 1883             │
+                    └────┬──────────────┬─────┘
+                         │              │
+              Subscribe  │              │  Subscribe
+          esp32/commands │              │  esp32/sensors/#
+                         │              │
+                    ┌────▼────┐    ┌────▼────┐
+                    │  ESP32  │    │  Host   │
+                    │  (QEMU) │    │ machine │
+                    └────┬────┘    └─────────┘
+                         │
+              Publish    │
+   esp32/sensors/temperature
+   esp32/sensors/humidity
+   esp32/status</code></pre>
+
+        <h3>Project: MQTT Client (<code>04-mqtt</code>)</h3>
+
+        <div class="card-grid">
+            <div class="card">
+                <h4>What It Does</h4>
+                <ul>
+                    <li>Connects to Mosquitto broker via MQTT</li>
+                    <li><strong>Publishes</strong> temperature and humidity readings every 5 seconds</li>
+                    <li><strong>Subscribes</strong> to <code>esp32/commands</code> for incoming commands</li>
+                    <li>Reacts to <code>toggle_led</code> and <code>get_status</code> commands</li>
+                    <li>Uses Last Will Testament (LWT) for disconnect detection</li>
+                    <li>Subscribes to own topics with wildcard (<code>esp32/sensors/#</code>)</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Concepts Covered</h4>
+                <ul>
+                    <li>MQTT publish/subscribe pattern</li>
+                    <li>Topic hierarchy and wildcards (<code>#</code>, <code>+</code>)</li>
+                    <li>QoS levels (0=at most once, 1=at least once)</li>
+                    <li>Last Will Testament (LWT)</li>
+                    <li>Retained messages</li>
+                    <li>FreeRTOS tasks for concurrent pub/sub</li>
+                </ul>
+            </div>
+        </div>
+
+        <h4>Running the Project</h4>
+        <pre><code># One command to start everything:
+./run-network-example.sh 04-mqtt
+
+# This script:
+# 1. Starts the Mosquitto MQTT broker container (port 1883)
+# 2. Builds the ESP32 project inside Docker
+# 3. Runs QEMU with networking enabled</code></pre>
+
+        <h4>Interacting from the Host</h4>
+        <p>While the ESP32 is running in QEMU, you can interact with it from your host machine using <code>mosquitto_pub</code> and <code>mosquitto_sub</code>:</p>
+        <pre><code># Watch all ESP32 messages (open in a separate terminal):
+mosquitto_sub -h localhost -t "esp32/#" -v
+
+# Send a command to toggle the LED:
+mosquitto_pub -h localhost -t esp32/commands -m toggle_led
+
+# Request device status:
+mosquitto_pub -h localhost -t esp32/commands -m get_status</code></pre>
+
+        <div class="alert alert-info">
+            <strong>Install Mosquitto clients:</strong><br>
+            macOS: <code>brew install mosquitto</code><br>
+            Ubuntu: <code>sudo apt install mosquitto-clients</code><br>
+            Windows: Download from <a href="https://mosquitto.org/download/" target="_blank">mosquitto.org</a>
+        </div>
+
+        <h4>MQTT Client Initialization</h4>
+        <p>ESP-IDF includes the <code>esp-mqtt</code> component with a clean event-driven API:</p>
+        <pre><code>#include "mqtt_client.h"
+
+static esp_mqtt_client_handle_t mqtt_client = NULL;
+
+static void init_mqtt(void)
+{
+    esp_mqtt_client_config_t mqtt_cfg = {
+        // Broker address (Mosquitto in Docker, via slirp gateway)
+        .broker.address.uri = "mqtt://10.0.2.2:1883",
+
+        // Client identification
+        .credentials.client_id = "esp32-qemu-01",
+
+        // Last Will Testament: broker publishes this if we disconnect
+        .session.last_will = {
+            .topic = "esp32/status",
+            .msg = "offline",
+            .msg_len = 7,
+            .qos = 1,
+            .retain = 1,    // Persists so new subscribers see it
+        },
+    };
+
+    mqtt_client = esp_mqtt_client_init(&amp;mqtt_cfg);
+    esp_mqtt_client_register_event(mqtt_client, ESP_EVENT_ANY_ID,
+                                   mqtt_event_handler, NULL);
+    esp_mqtt_client_start(mqtt_client);
+}</code></pre>
+
+        <h4>MQTT Event Handler</h4>
+        <pre><code>static void mqtt_event_handler(void *handler_args, esp_event_base_t base,
+                               int32_t event_id, void *event_data)
+{
+    esp_mqtt_event_handle_t event = (esp_mqtt_event_handle_t)event_data;
+
+    switch (event_id) {
+    case MQTT_EVENT_CONNECTED:
+        ESP_LOGI(TAG, "Connected to broker");
+        // Subscribe to command topic
+        esp_mqtt_client_subscribe(mqtt_client, "esp32/commands", 1);
+        // Publish online status (retained)
+        esp_mqtt_client_publish(mqtt_client, "esp32/status", "online", 0, 1, 1);
+        break;
+
+    case MQTT_EVENT_DATA:
+        // Incoming message received
+        ESP_LOGI(TAG, "Topic:   %.*s", event-&gt;topic_len, event-&gt;topic);
+        ESP_LOGI(TAG, "Payload: %.*s", event-&gt;data_len, event-&gt;data);
+        // React to commands...
+        break;
+
+    case MQTT_EVENT_DISCONNECTED:
+        ESP_LOGW(TAG, "Disconnected from broker");
+        break;
+    }
+}</code></pre>
+
+        <h4>Publishing Sensor Data</h4>
+        <pre><code>// Publish temperature reading as JSON (QoS 1, not retained)
+char msg[128];
+snprintf(msg, sizeof(msg),
+         "{\"device\":\"esp32-qemu-01\","
+         "\"value\":%.1f,\"unit\":\"C\",\"reading\":%d}",
+         temperature, reading_number);
+
+int msg_id = esp_mqtt_client_publish(
+    mqtt_client,
+    "esp32/sensors/temperature",  // topic
+    msg,                          // payload
+    0,                            // len (0 = auto from null-terminated string)
+    1,                            // QoS 1 = at least once delivery
+    0                             // retain = 0
+);
+ESP_LOGI(TAG, "Published msg_id=%d", msg_id);</code></pre>
+
+        <h4>MQTT Topics Used</h4>
+        <table>
+            <tr>
+                <th>Topic</th>
+                <th>Direction</th>
+                <th>QoS</th>
+                <th>Retained</th>
+                <th>Purpose</th>
+            </tr>
+            <tr>
+                <td><code>esp32/sensors/temperature</code></td>
+                <td>ESP32 &rarr; Broker</td>
+                <td>1</td>
+                <td>No</td>
+                <td>Temperature readings (JSON)</td>
+            </tr>
+            <tr>
+                <td><code>esp32/sensors/humidity</code></td>
+                <td>ESP32 &rarr; Broker</td>
+                <td>1</td>
+                <td>No</td>
+                <td>Humidity readings (JSON)</td>
+            </tr>
+            <tr>
+                <td><code>esp32/commands</code></td>
+                <td>Host &rarr; ESP32</td>
+                <td>1</td>
+                <td>No</td>
+                <td>Commands: <code>toggle_led</code>, <code>get_status</code></td>
+            </tr>
+            <tr>
+                <td><code>esp32/status</code></td>
+                <td>ESP32 &rarr; Broker</td>
+                <td>1</td>
+                <td>Yes</td>
+                <td>Online/offline status (LWT)</td>
+            </tr>
+            <tr>
+                <td><code>esp32/sensors/#</code></td>
+                <td>Broker &rarr; ESP32</td>
+                <td>0</td>
+                <td>-</td>
+                <td>Wildcard subscription (echo)</td>
+            </tr>
+        </table>
+
+        <h4>QoS Levels Explained</h4>
+        <div class="card-grid">
+            <div class="card">
+                <h4>QoS 0 — At Most Once</h4>
+                <p>"Fire and forget." Message is sent once with no acknowledgment. Fastest but messages can be lost.</p>
+                <p><strong>Use for:</strong> Frequent sensor readings where losing one isn't critical.</p>
+            </div>
+            <div class="card">
+                <h4>QoS 1 — At Least Once</h4>
+                <p>Message is sent and acknowledged. Retransmitted if no ACK received. May deliver duplicates.</p>
+                <p><strong>Use for:</strong> Important data like commands and alerts.</p>
+            </div>
+            <div class="card info">
+                <h4>QoS 2 — Exactly Once</h4>
+                <p>Four-step handshake guarantees single delivery. Slowest but most reliable.</p>
+                <p><strong>Use for:</strong> Financial transactions, critical state changes.</p>
+            </div>
+        </div>
+
+        <h4>Last Will Testament (LWT)</h4>
+        <p>When the ESP32 connects, it registers a "last will" message with the broker. If the ESP32 disconnects unexpectedly (network loss, crash), the broker automatically publishes this message on behalf of the device:</p>
+        <pre><code>// ESP32 connects and registers LWT:
+//   "If I disconnect unexpectedly, publish 'offline' to esp32/status"
+
+// Normal operation: ESP32 publishes "online" to esp32/status
+// Clean disconnect: ESP32 can publish "offline" before disconnecting
+// Crash/network loss: Broker publishes "offline" automatically (LWT)</code></pre>
+
+        <div class="alert alert-success">
+            <strong>Why This Matters:</strong> In production IoT systems, LWT is essential for monitoring device health. A dashboard can subscribe to <code>+/status</code> and instantly know when any device goes offline — even if it crashed or lost power.
+        </div>
+
+        <h4>The Mosquitto Broker</h4>
+        <p>Eclipse Mosquitto runs as a Docker container with a minimal configuration:</p>
+        <pre><code># mosquitto/mosquitto.conf
+listener 1883           # Listen on standard MQTT port
+allow_anonymous true    # No authentication (for development)
+log_type all            # Log all events
+connection_messages true</code></pre>
+
+        <p>Docker Compose adds the broker service:</p>
+        <pre><code>  mqtt-broker:
+    image: eclipse-mosquitto:2
+    container_name: iot-mqtt-broker
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    ports:
+      - "1883:1883"       # Exposed on host for QEMU slirp access
+    networks:
+      - esp32-net</code></pre>
+
+        <h3>Expected Demo Output</h3>
+        <pre><code>==========================================
+  ESP32 MQTT Pub/Sub Demo (QEMU)
+  IoT Course - Spring 2026
+==========================================
+
+I (xxx) mqtt-demo: Ethernet started
+I (xxx) mqtt-demo: Ethernet link up
+I (xxx) mqtt-demo: Got IP address: 10.0.2.15
+I (xxx) mqtt-demo: Connecting to MQTT broker...
+I (xxx) mqtt-demo:   Broker:    mqtt://10.0.2.2:1883
+I (xxx) mqtt-demo:   Client ID: esp32-qemu-01
+I (xxx) mqtt-demo: MQTT connected to broker
+I (xxx) mqtt-demo: Subscribed to esp32/commands, msg_id=1
+I (xxx) mqtt-demo: Subscribed to esp32/sensors/# (wildcard)
+
+I (xxx) mqtt-demo: Starting sensor publish loop
+I (xxx) mqtt-demo: [1/10] Published temperature=24.3 C (msg_id=3)
+I (xxx) mqtt-demo: [1/10] Published humidity=55.7 % (msg_id=4)
+I (xxx) mqtt-demo: ========================================
+I (xxx) mqtt-demo: MQTT message received!
+I (xxx) mqtt-demo:   Topic:   esp32/sensors/temperature
+I (xxx) mqtt-demo:   Payload: {"device":"esp32-qemu-01","value":24.3,...}
+I (xxx) mqtt-demo: ========================================
+
+... (10 readings, 5 seconds apart) ...
+
+==========================================
+  MQTT Demo complete!
+  Published 20 messages total
+  Press Ctrl+A then X to exit QEMU
+==========================================</code></pre>
+
+        <h3>Project Files</h3>
+        <pre><code>projects/04-mqtt/
+├── CMakeLists.txt              # ESP-IDF project file
+├── sdkconfig.defaults          # OpenCores Ethernet + MQTT config
+└── main/
+    ├── CMakeLists.txt          # Component registration
+    └── main.c                  # Ethernet init + MQTT pub/sub
+
+mosquitto/
+└── mosquitto.conf              # Broker configuration</code></pre>
+    </div>
+
+    <div id="casestudies" class="tab-content">
+        <h2>Case Studies: Arduino vs ESP-IDF for Real-World IoT</h2>
+
+        <div class="alert alert-info">
+            <strong>About These Case Studies:</strong> These real-world scenarios demonstrate where Arduino's simplicity becomes a limitation and where ESP-IDF's features provide elegant, efficient solutions. Each includes working code you can run in QEMU.
+        </div>
+
+        <!-- Case Study 1: Low Power -->
+        <h3>Case Study 1: Battery-Powered Environmental Sensor</h3>
+
+        <h4>The Problem</h4>
+        <div class="card">
+            <p><strong>Scenario:</strong> You're building a battery-powered environmental sensor that needs to:</p>
+            <ul>
+                <li>Read temperature sensor every 10 seconds</li>
+                <li>Run for months on a single battery charge</li>
+                <li>Minimize power consumption between readings</li>
+            </ul>
+            <p><strong>Key metric:</strong> Power consumption during idle time determines battery life.</p>
+        </div>
+
+        <h4>Arduino Approach 1: Naive delay()</h4>
+        <pre><code>void loop() {
+    int value = analogRead(SENSOR_PIN);
+    Serial.println(value);
+    delay(10000);  // Wait 10 seconds
+}</code></pre>
+
+        <div class="card danger">
+            <h4>Problem: CPU Stays at Full Power!</h4>
+            <p><code>delay()</code> doesn't put the CPU to sleep - it just busy-waits. The ESP32 consumes ~80mA the entire time, draining your battery in days instead of months.</p>
+            <table>
+                <tr>
+                    <th>State</th>
+                    <th>Current Draw</th>
+                    <th>Battery Life (2000mAh)</th>
+                </tr>
+                <tr>
+                    <td>Active with delay()</td>
+                    <td>~80mA</td>
+                    <td>~25 hours</td>
+                </tr>
+            </table>
+        </div>
+
+        <h4>Arduino Approach 2: Deep Sleep (Complex)</h4>
+        <pre><code>#include &lt;esp_sleep.h&gt;  // Borrowing from ESP-IDF!
+
+void setup() {
+    Serial.begin(115200);
+    int value = analogRead(SENSOR_PIN);
+    Serial.println(value);
+
+    // Deep sleep for 10 seconds
+    esp_deep_sleep(10000000);  // microseconds
+    // Note: Never reaches here - CPU resets on wake!
+}
+
+void loop() {
+    // Never called after deep sleep!
+}</code></pre>
+
+        <div class="card warning">
+            <h4>Problems with Deep Sleep in Arduino:</h4>
+            <ul>
+                <li><strong>Loses all RAM state</strong> - Variables reset on wake</li>
+                <li><strong>Not true Arduino</strong> - Mixing ESP-IDF functions</li>
+                <li><strong>setup() runs again</strong> - Must reinitialize everything</li>
+                <li><strong>Slow wake-up</strong> - ~250ms to restart</li>
+            </ul>
+        </div>
+
+        <h4>ESP-IDF Solution: Light Sleep (Elegant)</h4>
+        <pre><code>#include "esp_sleep.h"
+#include "esp_log.h"
+
+static const char *TAG = "LOW_POWER";
+
+void app_main(void)
+{
+    // Configure timer wake-up (10 seconds)
+    esp_sleep_enable_timer_wakeup(10000000);
+
+    while (1) {
+        // Read sensor
+        int value = read_sensor();
+        ESP_LOGI(TAG, "Sensor: %d", value);
+
+        // Enter light sleep - RAM preserved!
+        ESP_LOGI(TAG, "Sleeping...");
+        esp_light_sleep_start();
+
+        // Execution continues HERE after wake-up
+        ESP_LOGI(TAG, "Woke up!");
+    }
+}</code></pre>
+
+        <div class="card success">
+            <h4>ESP-IDF Advantages:</h4>
+            <ul>
+                <li><strong>RAM preserved</strong> - Variables retain their values</li>
+                <li><strong>Fast wake-up</strong> - ~1ms vs 250ms for deep sleep</li>
+                <li><strong>Linear code flow</strong> - Code continues after sleep()</li>
+                <li><strong>Full control</strong> - Choose between light/deep sleep</li>
+            </ul>
+        </div>
+
+        <h4>Power Comparison Table</h4>
+        <table>
+            <tr>
+                <th>Mode</th>
+                <th>Current Draw</th>
+                <th>RAM State</th>
+                <th>Wake Time</th>
+                <th>Battery Life*</th>
+            </tr>
+            <tr>
+                <td>Active / delay()</td>
+                <td>~80mA</td>
+                <td>Preserved</td>
+                <td>N/A</td>
+                <td>~25 hours</td>
+            </tr>
+            <tr>
+                <td>Light Sleep</td>
+                <td>~0.8mA</td>
+                <td>Preserved</td>
+                <td>~1ms</td>
+                <td>~104 days</td>
+            </tr>
+            <tr>
+                <td>Deep Sleep</td>
+                <td>~10uA</td>
+                <td>Lost</td>
+                <td>~250ms</td>
+                <td>~23 years</td>
+            </tr>
+        </table>
+        <p><em>* Theoretical maximum with 2000mAh battery, ignoring active time</em></p>
+
+        <h4>Run This Example in QEMU</h4>
+        <pre><code># Start Docker container
+docker run -it --rm -v "$(pwd)":/workspace esp32-qemu
+
+# Navigate to the example
+cd /workspace/slides/examples/espidf_low_power
+
+# Build the project
+idf.py build
+
+# Run in QEMU (or use the helper script)
+./run_qemu.sh
+
+# Expected output:
+# I (xxx) LOW_POWER: Low Power Periodic Sensor Reading Demo
+# I (xxx) LOW_POWER: [Reading #1] Sensor value: 59
+# I (xxx) LOW_POWER: Going to light sleep...
+# I (xxx) LOW_POWER: Woke up! Ready for next reading.
+
+# Exit QEMU: Ctrl+A, X</code></pre>
+
+        <div class="alert alert-warning">
+            <strong>QEMU Note:</strong> Light sleep may not work exactly as on real hardware in QEMU. The example includes a fallback mode that uses vTaskDelay() for demonstration purposes.
+        </div>
+
+        <hr style="margin: 40px 0;">
+
+        <!-- Case Study 2: Multi-Sensor -->
+        <h3>Case Study 2: Multi-Sensor Data Logger</h3>
+
+        <h4>The Problem</h4>
+        <div class="card">
+            <p><strong>Scenario:</strong> You're building a motion and environmental monitor that needs to:</p>
+            <ul>
+                <li><strong>Accelerometer:</strong> Sample every 10ms (for motion detection)</li>
+                <li><strong>Temperature:</strong> Sample every 20ms (for thermal monitoring)</li>
+                <li>Both sensors must run independently with precise timing</li>
+                <li>Code should be clean and maintainable</li>
+            </ul>
+        </div>
+
+        <h4>Arduino Approach 1: Blocking delay() - BROKEN</h4>
+        <pre><code>void loop() {
+    readAccelerometer();  // Takes ~1ms
+    delay(10);            // Wait 10ms
+
+    readTemperature();    // Takes ~1ms
+    delay(20);            // Wait 20ms
+}</code></pre>
+
+        <div class="card danger">
+            <h4>This Doesn't Work!</h4>
+            <ul>
+                <li>Accelerometer only reads every 32ms (10+1+20+1), not 10ms</li>
+                <li>Temperature reads every 32ms, not 20ms</li>
+                <li>Both timings are completely wrong!</li>
+                <li>The sensors block each other</li>
+            </ul>
+        </div>
+
+        <h4>Arduino Approach 2: millis() Polling - Complex</h4>
+        <pre><code>unsigned long lastAccelTime = 0;
+unsigned long lastTempTime = 0;
+
+void loop() {
+    unsigned long now = millis();
+
+    if (now - lastAccelTime >= 10) {
+        readAccelerometer();
+        lastAccelTime = now;
+    }
+
+    if (now - lastTempTime >= 20) {
+        readTemperature();
+        lastTempTime = now;
+    }
+}</code></pre>
+
+        <div class="card warning">
+            <h4>Problems with millis() Approach:</h4>
+            <ul>
+                <li><strong>Manual timing management</strong> - Error-prone, hard to maintain</li>
+                <li><strong>Gets messy</strong> - Imagine 5+ sensors!</li>
+                <li><strong>Timing drift</strong> - If sensor reads take time, timing slips</li>
+                <li><strong>No priority handling</strong> - Can't prioritize critical sensors</li>
+                <li><strong>CPU always polling</strong> - Wastes power checking time</li>
+            </ul>
+        </div>
+
+        <h4>ESP-IDF Solution 1: FreeRTOS Tasks (Clean)</h4>
+        <pre><code>// Each sensor runs in its own independent task
+
+void accelerometer_task(void *arg) {
+    while (1) {
+        read_accelerometer();
+        vTaskDelay(pdMS_TO_TICKS(10));  // Non-blocking!
+    }
+}
+
+void temperature_task(void *arg) {
+    while (1) {
+        read_temperature();
+        vTaskDelay(pdMS_TO_TICKS(20));  // Non-blocking!
+    }
+}
+
+void app_main(void) {
+    xTaskCreate(accelerometer_task, "accel", 2048, NULL, 5, NULL);
+    xTaskCreate(temperature_task, "temp", 2048, NULL, 5, NULL);
+}</code></pre>
+
+        <div class="card success">
+            <h4>FreeRTOS Task Advantages:</h4>
+            <ul>
+                <li><strong>True concurrency</strong> - Tasks run independently</li>
+                <li><strong>Clean code</strong> - Each sensor is self-contained</li>
+                <li><strong>Scales easily</strong> - Add more sensors by adding tasks</li>
+                <li><strong>Priority control</strong> - Critical sensors can have higher priority</li>
+                <li><strong>Non-blocking delays</strong> - vTaskDelay() lets other tasks run</li>
+            </ul>
+        </div>
+
+        <h4>ESP-IDF Solution 2: Hardware Timers (Even Better)</h4>
+        <pre><code>esp_timer_handle_t accel_timer, temp_timer;
+
+void accel_callback(void *arg) {
+    read_accelerometer();  // Called precisely every 10ms
+}
+
+void temp_callback(void *arg) {
+    read_temperature();    // Called precisely every 20ms
+}
+
+void app_main(void) {
+    // Create accelerometer timer
+    esp_timer_create_args_t accel_args = {
+        .callback = accel_callback,
+        .name = "accel"
+    };
+    esp_timer_create(&amp;accel_args, &amp;accel_timer);
+
+    // Create temperature timer
+    esp_timer_create_args_t temp_args = {
+        .callback = temp_callback,
+        .name = "temp"
+    };
+    esp_timer_create(&amp;temp_args, &amp;temp_timer);
+
+    // Start periodic timers (period in microseconds)
+    esp_timer_start_periodic(accel_timer, 10000);  // 10ms
+    esp_timer_start_periodic(temp_timer, 20000);   // 20ms
+
+    // Main task is free for other work!
+}</code></pre>
+
+        <div class="card success">
+            <h4>Hardware Timer Advantages:</h4>
+            <ul>
+                <li><strong>Hardware precision</strong> - Microsecond accuracy</li>
+                <li><strong>Minimal overhead</strong> - No task stack memory needed</li>
+                <li><strong>Perfect for simple periodic ops</strong> - Just callbacks</li>
+                <li><strong>Main task free</strong> - Can do other work or sleep</li>
+            </ul>
+        </div>
+
+        <h4>Comparison: Arduino vs ESP-IDF Approaches</h4>
+        <table>
+            <tr>
+                <th>Aspect</th>
+                <th>Arduino delay()</th>
+                <th>Arduino millis()</th>
+                <th>ESP-IDF Tasks</th>
+                <th>ESP-IDF Timers</th>
+            </tr>
+            <tr>
+                <td>Correct Timing</td>
+                <td class="danger">No</td>
+                <td>Approximate</td>
+                <td>Yes</td>
+                <td>Precise</td>
+            </tr>
+            <tr>
+                <td>Code Clarity</td>
+                <td>Simple but wrong</td>
+                <td>Complex</td>
+                <td>Clean</td>
+                <td>Very Clean</td>
+            </tr>
+            <tr>
+                <td>Scalability</td>
+                <td>Poor</td>
+                <td>Poor</td>
+                <td>Excellent</td>
+                <td>Excellent</td>
+            </tr>
+            <tr>
+                <td>CPU Efficiency</td>
+                <td>Wasted</td>
+                <td>Polling</td>
+                <td>Good</td>
+                <td>Best</td>
+            </tr>
+            <tr>
+                <td>Priority Control</td>
+                <td>No</td>
+                <td>No</td>
+                <td>Yes</td>
+                <td>N/A</td>
+            </tr>
+        </table>
+
+        <h4>Run This Example in QEMU</h4>
+        <pre><code># Start Docker container
+docker run -it --rm -v "$(pwd)":/workspace esp32-qemu
+
+# Navigate to the example
+cd /workspace/slides/examples/espidf_multi_sensor
+
+# Build the project
+idf.py build
+
+# Run in QEMU
+./run_qemu.sh
+
+# Expected output - notice the interleaved readings:
+# I (xxx) ACCEL: [Task] Reading #1: X=-987, Y=-983, Z=1007
+# I (xxx) TEMP:  [Task] Reading #1: Temperature = 25.1 C
+# I (xxx) ACCEL: [Task] Reading #2: X=-974, Y=-966, Z=1014
+# I (xxx) ACCEL: [Task] Reading #3: X=-961, Y=-949, Z=1021
+# I (xxx) TEMP:  [Task] Reading #2: Temperature = 25.2 C
+# ...
+
+# Exit QEMU: Ctrl+A, X</code></pre>
+
+        <hr style="margin: 40px 0;">
+
+        <!-- Summary -->
+        <h3>Summary: When to Use Each Approach</h3>
+
+        <div class="card-grid">
+            <div class="card info">
+                <h4>Use Arduino When:</h4>
+                <ul>
+                    <li>Quick prototype, timing not critical</li>
+                    <li>Single sensor, simple logic</li>
+                    <li>Power consumption doesn't matter</li>
+                    <li>Learning embedded basics</li>
+                </ul>
+            </div>
+            <div class="card success">
+                <h4>Use ESP-IDF When:</h4>
+                <ul>
+                    <li>Battery-powered device</li>
+                    <li>Multiple sensors at different rates</li>
+                    <li>Precise timing required</li>
+                    <li>Production-quality code needed</li>
+                    <li>Complex concurrent operations</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="alert alert-success">
+            <strong>Key Takeaway:</strong> Arduino excels at getting started quickly, but ESP-IDF provides the tools (FreeRTOS tasks, hardware timers, sleep modes) needed for real-world IoT applications with multiple sensors, precise timing, and power efficiency requirements.
+        </div>
+    </div>
+
+    <!-- Quick Reference Tab -->
+    <div id="commands" class="tab-content">
+        <h2>Quick Reference</h2>
+
+        <h3>Docker Commands</h3>
+        <table>
+            <tr>
+                <th>Command</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>docker build -t esp32-qemu .</code></td>
+                <td>Build the Docker image</td>
+            </tr>
+            <tr>
+                <td><code>docker run -it --rm -v "$(pwd)":/workspace esp32-qemu</code></td>
+                <td>Start interactive container</td>
+            </tr>
+            <tr>
+                <td><code>docker ps</code></td>
+                <td>List running containers</td>
+            </tr>
+            <tr>
+                <td><code>docker images | grep esp32</code></td>
+                <td>Check if image exists</td>
+            </tr>
+            <tr>
+                <td><code>docker kill $(docker ps -q)</code></td>
+                <td>Kill all containers</td>
+            </tr>
+        </table>
+
+        <h3>ESP-IDF Commands</h3>
+        <table>
+            <tr>
+                <th>Command</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>idf.py set-target esp32</code></td>
+                <td>Configure for ESP32 target (run once, also cleans build)</td>
+            </tr>
+            <tr>
+                <td><code>idf.py build</code></td>
+                <td>Compile the project</td>
+            </tr>
+            <tr>
+                <td><code>idf.py clean</code></td>
+                <td>Remove compiled objects, keep sdkconfig and cmake cache (faster rebuild)</td>
+            </tr>
+            <tr>
+                <td><code>idf.py fullclean</code></td>
+                <td>Delete entire <code>build/</code> directory (full rebuild required after)</td>
+            </tr>
+            <tr>
+                <td><code>idf.py reconfigure</code></td>
+                <td>Re-run cmake without cleaning (after changing CMakeLists.txt)</td>
+            </tr>
+            <tr>
+                <td><code>idf.py menuconfig</code></td>
+                <td>Configure project settings (interactive menu)</td>
+            </tr>
+            <tr>
+                <td><code>idf.py flash</code></td>
+                <td>Flash to real device (not used in QEMU)</td>
+            </tr>
+            <tr>
+                <td><code>idf.py monitor</code></td>
+                <td>Serial monitor (not used in QEMU)</td>
+            </tr>
+        </table>
+
+        <h4>Clean and Rebuild</h4>
+        <pre><code># Quick rebuild (after code changes only):
+idf.py clean
+idf.py build
+
+# Full rebuild (after changing sdkconfig.defaults, target, or broken build):
+idf.py fullclean
+idf.py set-target esp32
+idf.py build</code></pre>
+
+        <div class="alert alert-info">
+            <strong>When to use which?</strong><br>
+            <code>idf.py clean</code> &rarr; You changed <code>.c</code> files and want a faster rebuild<br>
+            <code>idf.py fullclean</code> &rarr; You changed <code>sdkconfig.defaults</code>, CMakeLists, or the build is broken
+        </div>
+
+        <h3>QEMU Commands</h3>
+        <pre><code># Create 4MB flash image
+esptool.py --chip esp32 merge_bin \
+    --fill-flash-size 4MB \
+    -o build/flash_image.bin \
+    --flash_mode dio \
+    --flash_size 4MB \
+    0x1000 build/bootloader/bootloader.bin \
+    0x8000 build/partition_table/partition-table.bin \
+    0x10000 build/YOUR_APP.bin
+
+# Run in QEMU
+qemu-system-xtensa -nographic \
+    -machine esp32 \
+    -drive file=build/flash_image.bin,if=mtd,format=raw
+
+# Run with GDB debugging
+qemu-system-xtensa -nographic \
+    -machine esp32 \
+    -drive file=build/flash_image.bin,if=mtd,format=raw \
+    -s -S</code></pre>
+
+        <h3>QEMU Keyboard Shortcuts</h3>
+        <table>
+            <tr>
+                <th>Keys</th>
+                <th>Action</th>
+            </tr>
+            <tr>
+                <td><kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>X</kbd></td>
+                <td>Quit QEMU</td>
+            </tr>
+            <tr>
+                <td><kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>C</kbd></td>
+                <td>Switch to QEMU monitor</td>
+            </tr>
+            <tr>
+                <td><kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>H</kbd></td>
+                <td>Show help</td>
+            </tr>
+        </table>
+
+        <h3>Running Network Projects</h3>
+
+        <h4>REST API Project (03-rest-api)</h4>
+        <pre><code># One-liner (interactive):
+./run-network-example.sh 03-rest-api
+
+# Or step-by-step:
+
+# 1. Start the Flask API server
+docker compose up -d api-server
+
+# 2. Build the ESP32 REST project (takes a few minutes first time)
+docker compose run --rm esp32-dev \
+    /workspace/scripts/build.sh /workspace/projects/03-rest-api
+
+# 3. Run in QEMU with networking (Ctrl+A, X to exit)
+docker compose run --rm -e QEMU_NET=1 esp32-dev \
+    /workspace/scripts/run-qemu.sh /workspace/projects/03-rest-api
+
+# 4. Verify: check sensor data received by API server
+curl http://localhost:5000/api/sensors
+
+# 5. Cleanup
+docker compose stop api-server</code></pre>
+
+        <h4>MQTT Project (04-mqtt)</h4>
+        <pre><code># One-liner (interactive):
+./run-network-example.sh 04-mqtt
+
+# Or step-by-step:
+
+# 1. Start the Mosquitto MQTT broker
+docker compose up -d mqtt-broker
+
+# 2. Build the ESP32 MQTT project
+docker compose run --rm esp32-dev \
+    /workspace/scripts/build.sh /workspace/projects/04-mqtt
+
+# 3. (Optional) In a separate terminal, watch all MQTT messages:
+mosquitto_sub -h localhost -t "esp32/#" -v
+
+# 4. Run in QEMU with networking (Ctrl+A, X to exit)
+docker compose run --rm -e QEMU_NET=1 esp32-dev \
+    /workspace/scripts/run-qemu.sh /workspace/projects/04-mqtt
+
+# 5. (Optional) Send a command while QEMU is running:
+mosquitto_pub -h localhost -t esp32/commands -m toggle_led
+mosquitto_pub -h localhost -t esp32/commands -m get_status
+
+# 6. Cleanup
+docker compose stop mqtt-broker</code></pre>
+
+        <h4>Clean Rebuild for Network Projects</h4>
+        <pre><code># Enter the Docker container interactively:
+docker compose run --rm esp32-dev bash
+
+# Then inside the container:
+cd /workspace/projects/03-rest-api    # or 04-mqtt
+idf.py fullclean
+idf.py set-target esp32
+idf.py build
+
+# Exit container when done:
+exit</code></pre>
+
+        <h3>Troubleshooting</h3>
+
+        <div class="card danger">
+            <h4>Error: "only 2, 4, 8, 16 MB flash images are supported"</h4>
+            <p>Add <code>--fill-flash-size 4MB</code> to your esptool.py merge_bin command.</p>
+        </div>
+
+        <div class="card danger">
+            <h4>Error: "tomli not found" during Docker build</h4>
+            <p>Add <code>RUN pip3 install tomli</code> before the QEMU configure step in Dockerfile.</p>
+        </div>
+
+        <div class="card danger">
+            <h4>Can't exit QEMU with Ctrl+A X</h4>
+            <p>If inside <code>screen</code>, use <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>A</kbd>, <kbd>X</kbd> (press A twice).</p>
+        </div>
+
+        <div class="card danger">
+            <h4>Build fails with missing headers</h4>
+            <p>Make sure you're inside the Docker container where ESP-IDF is installed.</p>
+        </div>
+
+        <div class="card danger">
+            <h4>ESP32 fails to get IP address in QEMU</h4>
+            <p>Make sure QEMU is started with networking: <code>-nic user,model=open_eth</code>. If using the scripts, set <code>QEMU_NET=1</code> environment variable or use <code>./run-network-example.sh</code>.</p>
+        </div>
+
+        <div class="card danger">
+            <h4>ESP32 can't reach API server or MQTT broker</h4>
+            <p>QEMU slirp maps the host to <code>10.0.2.2</code>. Make sure the backend service is running (<code>docker compose up -d api-server</code> or <code>docker compose up -d mqtt-broker</code>) and its port is exposed on the host (5000 for API, 1883 for MQTT). Check with <code>docker compose ps</code>.</p>
+        </div>
+
+        <div class="card danger">
+            <h4>CONFIG_ETH_USE_OPENETH error or Ethernet init fails</h4>
+            <p>Run <code>idf.py fullclean &amp;&amp; idf.py set-target esp32 &amp;&amp; idf.py build</code> to ensure <code>sdkconfig.defaults</code> is applied correctly. The OpenCores Ethernet driver only works in QEMU, not on real hardware.</p>
+        </div>
+
+        <div class="card danger">
+            <h4>MQTT: "mosquitto_pub: command not found"</h4>
+            <p>Install Mosquitto clients on your host:<br>
+            macOS: <code>brew install mosquitto</code><br>
+            Ubuntu: <code>sudo apt install mosquitto-clients</code></p>
+        </div>
+    </div>
+
+    <!-- References Tab -->
+    <div id="references" class="tab-content">
+        <h2>References & Resources</h2>
+        <p>Curated list of official documentation, tutorials, and learning resources for ESP32 development.</p>
+
+        <h3>Official Documentation</h3>
+        <table>
+            <tr>
+                <th>Resource</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><a href="https://docs.espressif.com/projects/esp-idf/en/stable/" target="_blank">ESP-IDF Programming Guide</a></td>
+                <td>Official ESP-IDF documentation - API references, guides, examples</td>
+            </tr>
+            <tr>
+                <td><a href="https://docs.espressif.com/projects/arduino-esp32/en/latest/" target="_blank">Arduino-ESP32 Documentation</a></td>
+                <td>Official Arduino core for ESP32</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf" target="_blank">ESP32 Datasheet</a></td>
+                <td>Hardware specifications, pinouts, electrical characteristics</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.espressif.com/sites/default/files/documentation/esp32_technical_reference_manual_en.pdf" target="_blank">ESP32 Technical Reference</a></td>
+                <td>Detailed hardware peripheral documentation</td>
+            </tr>
+        </table>
+
+        <h3>FreeRTOS Resources</h3>
+        <table>
+            <tr>
+                <th>Resource</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><a href="https://www.freertos.org/Documentation/RTOS_book.html" target="_blank">Mastering the FreeRTOS Kernel</a></td>
+                <td>Free official book - comprehensive guide to FreeRTOS</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.freertos.org/a00106.html" target="_blank">FreeRTOS API Reference</a></td>
+                <td>Complete API documentation for all FreeRTOS functions</td>
+            </tr>
+            <tr>
+                <td><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/freertos.html" target="_blank">ESP-IDF FreeRTOS Additions</a></td>
+                <td>ESP32-specific FreeRTOS features and modifications</td>
+            </tr>
+        </table>
+
+        <h3>ESP-IDF API References</h3>
+        <div class="card-grid">
+            <div class="card">
+                <h4>Peripherals</h4>
+                <ul>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/gpio.html" target="_blank">GPIO</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/uart.html" target="_blank">UART</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/i2c.html" target="_blank">I2C</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/spi_master.html" target="_blank">SPI</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/adc.html" target="_blank">ADC</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/ledc.html" target="_blank">PWM (LEDC)</a></li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Networking</h4>
+                <ul>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/network/esp_wifi.html" target="_blank">WiFi</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/wifi.html" target="_blank">WiFi Driver Guide</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/protocols/esp_http_client.html" target="_blank">HTTP Client</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/protocols/mqtt.html" target="_blank">MQTT</a></li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>System</h4>
+                <ul>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/esp_timer.html" target="_blank">Timers</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/log.html" target="_blank">Logging</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/storage/nvs_flash.html" target="_blank">NVS (Non-Volatile Storage)</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/ota.html" target="_blank">OTA Updates</a></li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Bluetooth</h4>
+                <ul>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/bluetooth/index.html" target="_blank">Bluetooth Overview</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/bluetooth/esp_gap_ble.html" target="_blank">BLE GAP</a></li>
+                    <li><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/bluetooth/esp_gatt_defs.html" target="_blank">BLE GATT</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>GitHub Repositories</h3>
+        <table>
+            <tr>
+                <th>Repository</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/espressif/esp-idf" target="_blank">espressif/esp-idf</a></td>
+                <td>Official ESP-IDF framework source code</td>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/espressif/arduino-esp32" target="_blank">espressif/arduino-esp32</a></td>
+                <td>Arduino core for ESP32</td>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/espressif/esp-idf/tree/master/examples" target="_blank">ESP-IDF Examples</a></td>
+                <td>Official examples for all features</td>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/espressif/qemu" target="_blank">espressif/qemu</a></td>
+                <td>Espressif's QEMU fork with ESP32 support</td>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/espressif/esp-iot-solution" target="_blank">espressif/esp-iot-solution</a></td>
+                <td>Additional components and drivers</td>
+            </tr>
+        </table>
+
+        <h3>Learning Tutorials</h3>
+        <table>
+            <tr>
+                <th>Resource</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/index.html" target="_blank">ESP-IDF Get Started Guide</a></td>
+                <td>Official getting started tutorial</td>
+            </tr>
+            <tr>
+                <td><a href="https://randomnerdtutorials.com/projects-esp32/" target="_blank">Random Nerd Tutorials - ESP32</a></td>
+                <td>Extensive collection of ESP32 project tutorials</td>
+            </tr>
+            <tr>
+                <td><a href="https://lastminuteengineers.com/electronics/esp32-projects/" target="_blank">Last Minute Engineers - ESP32</a></td>
+                <td>In-depth tutorials with circuit diagrams</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.youtube.com/results?search_query=esp32+esp-idf+tutorial" target="_blank">YouTube ESP-IDF Tutorials</a></td>
+                <td>Video tutorials for visual learners</td>
+            </tr>
+        </table>
+
+        <h3>Community & Support</h3>
+        <table>
+            <tr>
+                <th>Platform</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><a href="https://esp32.com/" target="_blank">ESP32 Forum</a></td>
+                <td>Official Espressif community forum</td>
+            </tr>
+            <tr>
+                <td><a href="https://www.reddit.com/r/esp32/" target="_blank">r/esp32</a></td>
+                <td>Reddit community for ESP32</td>
+            </tr>
+            <tr>
+                <td><a href="https://stackoverflow.com/questions/tagged/esp32" target="_blank">Stack Overflow [esp32]</a></td>
+                <td>Q&A for programming questions</td>
+            </tr>
+            <tr>
+                <td><a href="https://gitter.im/espressif/arduino-esp32" target="_blank">Gitter Chat</a></td>
+                <td>Real-time chat with community</td>
+            </tr>
+        </table>
+
+        <h3>Books</h3>
+        <div class="card-grid">
+            <div class="card">
+                <h4>Kolban's Book on ESP32</h4>
+                <p>Free comprehensive guide to ESP32 programming</p>
+                <p><a href="https://leanpub.com/kolban-ESP32" target="_blank">Download (Free)</a></p>
+            </div>
+            <div class="card">
+                <h4>Mastering the FreeRTOS Kernel</h4>
+                <p>Official FreeRTOS guide - essential for understanding ESP-IDF</p>
+                <p><a href="https://www.freertos.org/Documentation/RTOS_book.html" target="_blank">Download (Free)</a></p>
+            </div>
+            <div class="card">
+                <h4>Internet of Things with ESP32</h4>
+                <p>Practical IoT projects with ESP32</p>
+                <p><em>Various publishers - check Amazon/O'Reilly</em></p>
+            </div>
+        </div>
+
+        <h3>Tools & Utilities</h3>
+        <table>
+            <tr>
+                <th>Tool</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/espressif/esptool" target="_blank">esptool.py</a></td>
+                <td>Flash firmware, read/write flash, create images</td>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/espressif/esp-idf-monitor" target="_blank">idf_monitor</a></td>
+                <td>Serial monitor with special features</td>
+            </tr>
+            <tr>
+                <td><a href="https://github.com/espressif/vscode-esp-idf-extension" target="_blank">VS Code ESP-IDF Extension</a></td>
+                <td>Official VS Code extension for ESP-IDF development</td>
+            </tr>
+            <tr>
+                <td><a href="https://wokwi.com/" target="_blank">Wokwi Simulator</a></td>
+                <td>Online ESP32 simulator (alternative to QEMU)</td>
+            </tr>
+        </table>
+
+        <h3>Cheat Sheets</h3>
+        <div class="card info">
+            <h4>Quick API Cheat Sheet</h4>
+            <pre><code>// GPIO
+gpio_set_direction(pin, GPIO_MODE_OUTPUT);
+gpio_set_level(pin, 1);
+int level = gpio_get_level(pin);
+
+// Logging
+ESP_LOGI(TAG, "Info: %d", value);
+ESP_LOGE(TAG, "Error!");
+
+// Tasks
+xTaskCreate(func, "name", 2048, NULL, 5, NULL);
+vTaskDelay(pdMS_TO_TICKS(1000));
+
+// Queues
+queue = xQueueCreate(10, sizeof(int));
+xQueueSend(queue, &data, portMAX_DELAY);
+xQueueReceive(queue, &data, portMAX_DELAY);
+
+// Timers
+esp_timer_start_periodic(timer, 1000000); // microseconds
+
+// Error handling
+ESP_ERROR_CHECK(function());
+ESP_RETURN_ON_ERROR(function(), TAG, "Failed");</code></pre>
+        </div>
+
+        <div class="alert alert-success">
+            <strong>Tip:</strong> Bookmark the <a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/index.html" target="_blank">ESP-IDF API Reference</a> - you'll use it constantly!
+        </div>
+    </div>
+    </div> <!-- end tab-content-wrapper -->
+</div>
+
+<footer>
+    <p>ESP32 Development Guide | IoT Course - Spring 2026</p>
+</footer>
+
+<script>
+    // Tab functionality
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all buttons and content
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to clicked button and corresponding content
+            button.classList.add('active');
+            document.getElementById(button.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Add copy buttons to code blocks
+    document.querySelectorAll('pre').forEach(block => {
+        const button = document.createElement('button');
+        button.className = 'copy-btn';
+        button.textContent = 'Copy';
+        button.addEventListener('click', () => {
+            const code = block.querySelector('code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                button.textContent = 'Copied!';
+                setTimeout(() => button.textContent = 'Copy', 2000);
+            });
+        });
+        block.style.position = 'relative';
+        block.appendChild(button);
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+# Build outputs
+**/build/
+**/managed_components/
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ESP-IDF
+sdkconfig
+sdkconfig.old
+
+# LaTeX build artifacts
+slides/*.aux
+slides/*.log
+slides/*.nav
+slides/*.out
+slides/*.snm
+slides/*.toc
+slides/*.vrb
+
+# Python
+__pycache__/
+*.pyc
+
+# Docker
+.docker/

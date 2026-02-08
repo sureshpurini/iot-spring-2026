@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  esp32-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: esp32-qemu-dev:latest
+    container_name: esp32-qemu
+    volumes:
+      # Mount projects directory
+      - ./projects:/workspace/projects
+      # Mount shared scripts
+      - ./scripts:/workspace/scripts:ro
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    # For GUI applications (optional)
+    environment:
+      - DISPLAY=${DISPLAY:-}
+    networks:
+      - esp32-net
+
+  api-server:
+    build:
+      context: ./api-server
+      dockerfile: Dockerfile
+    image: iot-api-server:latest
+    container_name: iot-api-server
+    ports:
+      - "5000:5000"
+    networks:
+      - esp32-net
+
+  mqtt-broker:
+    image: eclipse-mosquitto:2
+    container_name: iot-mqtt-broker
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    ports:
+      - "1883:1883"
+    networks:
+      - esp32-net
+
+networks:
+  esp32-net:
+    driver: bridge
