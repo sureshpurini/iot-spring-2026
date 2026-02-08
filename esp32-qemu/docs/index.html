@@ -2964,8 +2964,8 @@ docker compose run --rm esp32-dev \
             </tr>
             <tr>
                 <td>Networking (HTTP/MQTT)</td>
-                <td>No (needs WiFi)</td>
-                <td>Yes (OpenCores Ethernet)</td>
+                <td><strong>No</strong> (needs WiFi)</td>
+                <td><strong>Yes</strong> (OpenCores Ethernet)</td>
             </tr>
             <tr>
                 <td>Build tool</td>
@@ -2973,6 +2973,72 @@ docker compose run --rm esp32-dev \
                 <td><code>idf.py</code></td>
             </tr>
         </table>
+
+        <h4>Why Can't Arduino Do Networking in QEMU?</h4>
+        <p>This is one of the most important architectural differences between Arduino and ESP-IDF, and a great illustration of the trade-off between simplicity and control.</p>
+
+        <div class="card-grid">
+            <div class="card warning">
+                <h4>Arduino Networking Stack</h4>
+                <pre><code>Your Sketch
+    │
+    ▼
+HTTPClient / PubSubClient
+    │
+    ▼
+WiFiClient        ◀── hardwired to WiFi
+    │
+    ▼
+WiFi.begin()      ◀── QEMU can't emulate WiFi
+    ✘</code></pre>
+                <p>Arduino's HTTP and MQTT libraries depend on <code>WiFiClient</code>, which only works through the WiFi radio. There is no way to plug in a different network interface.</p>
+            </div>
+            <div class="card success">
+                <h4>ESP-IDF Networking Stack</h4>
+                <pre><code>Your Application
+    │
+    ▼
+esp_http_client / esp_mqtt_client
+    │
+    ▼
+esp_netif         ◀── abstraction layer
+    │
+    ├──▶ WiFi     (real hardware)
+    ├──▶ Ethernet (real hardware)
+    └──▶ OpenCores Ethernet (QEMU) ✔</code></pre>
+                <p>ESP-IDF's <code>esp_netif</code> abstracts the network interface. Your application code (HTTP, MQTT) is <em>identical</em> regardless of whether the underlying transport is WiFi, Ethernet, or QEMU's virtual NIC.</p>
+            </div>
+        </div>
+
+        <p>The key insight: <strong>Arduino trades flexibility for simplicity.</strong> Its <code>WiFi.h</code> library is easy to use but locks you into WiFi. ESP-IDF's <code>esp_netif</code> requires more setup but lets you swap the network interface without changing application code.</p>
+
+        <h4>Recommended Learning Path</h4>
+        <table>
+            <tr>
+                <th>Stage</th>
+                <th>What to Use</th>
+                <th>Where</th>
+            </tr>
+            <tr>
+                <td>1. Learn basics (GPIO, Serial, timers)</td>
+                <td>Arduino sketches</td>
+                <td>QEMU or real hardware</td>
+            </tr>
+            <tr>
+                <td>2. Learn networking (REST, MQTT)</td>
+                <td>ESP-IDF projects</td>
+                <td>QEMU (OpenCores Ethernet)</td>
+            </tr>
+            <tr>
+                <td>3. Deploy to real hardware</td>
+                <td>Either Arduino or ESP-IDF</td>
+                <td>Real ESP32 (WiFi)</td>
+            </tr>
+        </table>
+
+        <div class="alert alert-success">
+            <strong>Teaching Takeaway:</strong> Start with Arduino to validate ideas quickly, then move to ESP-IDF when you need networking in QEMU or full hardware control in production. The networking concepts (HTTP methods, MQTT pub/sub, JSON payloads) are the same regardless of framework &mdash; only the plumbing differs.
+        </div>
 
         <h3>Running Network Projects</h3>
 
