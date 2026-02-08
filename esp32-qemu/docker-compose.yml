@@ -10,6 +10,8 @@ services:
     volumes:
       # Mount projects directory
       - ./projects:/workspace/projects
+      # Mount Arduino sketches
+      - ../arduino:/workspace/arduino
       # Mount shared scripts
       - ./scripts:/workspace/scripts:ro
     working_dir: /workspace

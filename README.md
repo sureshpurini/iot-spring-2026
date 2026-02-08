@@ -43,7 +43,21 @@ See [`esp32-qemu/docs/index.html`](esp32-qemu/docs/index.html) for the full inte
 
 ### Arduino IDE Examples
 
-Simple Arduino sketches for ESP32 — good for quick prototyping and learning the basics.
+Simple Arduino sketches for ESP32 — can be run in QEMU or on real hardware.
+
+```bash
+# Run in QEMU (no hardware needed):
+cd esp32-qemu
+./run-arduino-example.sh 01-blink
+./run-arduino-example.sh 02-serial-output
+```
+
+| Sketch | Description | QEMU |
+|--------|-------------|------|
+| `01-blink` | Blink LED on GPIO 2 with Serial output | Yes |
+| `02-serial-output` | Chip info, counters, timing, simulated ADC | Yes |
+
+**Note:** WiFi/BLE sketches require real hardware. GPIO, Serial, timers work in QEMU.
 
 ### Slides
 

@@ -65,6 +65,16 @@ RUN ./configure \
 # Add QEMU to PATH
 ENV PATH="/opt/qemu-esp32/bin:${PATH}"
 
+# Install arduino-cli and ESP32 Arduino core
+RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=/usr/local/bin sh
+
+# Install ESP32 Arduino core
+RUN arduino-cli config init \
+    && arduino-cli config add board_manager.additional_urls \
+       https://espressif.github.io/arduino-esp32/package_esp32_index.json \
+    && arduino-cli core update-index \
+    && arduino-cli core install esp32:esp32@2.0.14
+
 # Create workspace directory
 WORKDIR /workspace
 

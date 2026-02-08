@@ -2914,6 +2914,66 @@ qemu-system-xtensa -nographic \
             </tr>
         </table>
 
+        <h3>Running Arduino Sketches in QEMU</h3>
+        <p>Arduino sketches can also be compiled and run in QEMU using <code>arduino-cli</code> (installed in the Docker image).</p>
+
+        <pre><code># One-liner:
+./run-arduino-example.sh 01-blink
+./run-arduino-example.sh 02-serial-output
+
+# Or step-by-step:
+
+# 1. Build the Arduino sketch
+docker compose run --rm esp32-dev \
+    /workspace/scripts/arduino-build.sh /workspace/arduino/01-blink
+
+# 2. Run in QEMU (Ctrl+A, X to exit)
+docker compose run --rm esp32-dev \
+    /workspace/scripts/arduino-run-qemu.sh /workspace/arduino/01-blink</code></pre>
+
+        <div class="alert alert-warning">
+            <strong>QEMU Limitation:</strong> Only sketches that use GPIO, Serial, timers, and basic logic work in QEMU. WiFi (<code>WiFi.begin()</code>) and Bluetooth are <em>not</em> emulated. For networking in QEMU, use ESP-IDF projects (03-rest-api, 04-mqtt) which use the OpenCores Ethernet driver.
+        </div>
+
+        <h4>Arduino vs ESP-IDF in QEMU</h4>
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>Arduino in QEMU</th>
+                <th>ESP-IDF in QEMU</th>
+            </tr>
+            <tr>
+                <td>GPIO / LED</td>
+                <td>Yes</td>
+                <td>Yes</td>
+            </tr>
+            <tr>
+                <td>Serial / UART</td>
+                <td>Yes</td>
+                <td>Yes</td>
+            </tr>
+            <tr>
+                <td>Timers / delay</td>
+                <td>Yes</td>
+                <td>Yes</td>
+            </tr>
+            <tr>
+                <td>FreeRTOS tasks</td>
+                <td>Hidden (runs on top)</td>
+                <td>Full control</td>
+            </tr>
+            <tr>
+                <td>Networking (HTTP/MQTT)</td>
+                <td>No (needs WiFi)</td>
+                <td>Yes (OpenCores Ethernet)</td>
+            </tr>
+            <tr>
+                <td>Build tool</td>
+                <td><code>arduino-cli</code></td>
+                <td><code>idf.py</code></td>
+            </tr>
+        </table>
+
         <h3>Running Network Projects</h3>
 
         <h4>REST API Project (03-rest-api)</h4>
